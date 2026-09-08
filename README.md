@@ -1,22 +1,26 @@
 # Daisy Seed Bass Analyzer
 
-First working libDaisy milestone for a monophonic bass analyzer. The firmware
-passes the left codec input to both outputs and reports envelope, onset,
-normalized-autocorrelation pitch, confidence and gate state over USB serial.
+Tracker v2 is a monophonic bass analyzer for Daisy Seed. The firmware passes
+the left codec input to both outputs and emits a CSV analysis record for every
+completed pitch frame over USB serial.
 
 ## Signal path
 
 - 48 kHz audio, 16-sample blocks
 - DC blocker, coefficient 0.995
 - one-pole low-pass at approximately 1.2 kHz
-- envelope follower: 1.5 ms attack, 80 ms release
+- envelope follower: 1.5 ms attack, 80 ms release, hysteretic signal gate
 - 4x decimation to 12 kHz
 - 512-sample analysis window with 128-sample hop
-- normalized autocorrelation search over lags 30 through 400
-- initial gate threshold 0.003
+- normalized autocorrelation search over lags 30 through 400 (approximately
+  30–400 Hz at the 12 kHz analysis rate)
+- top six autocorrelation local-maximum candidates
+- harmonic/subharmonic evidence, temporal continuity and pitch hysteresis
+- separate onset/attack, signal-gate and pitch-valid states
 
-The first detector deliberately reports raw strongest-lag results. Octave
-correction, continuity tracking and confidence hysteresis are future work.
+The raw strongest autocorrelation candidate remains in the CSV output for
+debugging. `tracked_*` fields come from the candidate tracker; no MIDI-note
+quantization is performed.
 
 ## Build
 
@@ -52,11 +56,46 @@ ssh pi@daisies.local \
   'stty -F /dev/ttyACM0 115200 raw -echo; cat /dev/ttyACM0'
 ```
 
-Example output:
+The two lines printed by libDaisy while USB logging starts are non-CSV. All
+subsequent analysis lines use this header:
 
 ```text
-F=41.24  CONF=0.973  ENV=0.151  ATT=0.310  G=1
+seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,tracked_confidence,envelope,attack,gate,pitch_valid,onset,c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score
 ```
 
 Use a suitable instrument input, buffer or DI/preamp for a passive bass
 pickup. The firmware expects the Daisy audio codec input, not a GPIO pin.
+
+## Capturing labelled tests
+
+Install pyserial on the host that sees the Daisy USB serial device, then run:
+
+```bash
+python3 tools/capture.py /dev/ttyACM0 open_E --duration 10
+```
+
+The capture script creates a timestamped file in `captures/`, adds a `label`
+column, skips startup text and malformed rows, and handles `Ctrl-C` cleanly.
+Captures are intentionally ignored by Git.
+
+Recommended labelled captures:
+
+```text
+silence
+open_B
+open_E
+open_A
+open_D
+open_G
+E_12th
+soft_E
+hard_E
+muted_E
+hammer_E_Fsharp
+slide_E_A
+slide_A_E
+chromatic_E_string
+```
+
+For each open string, capture about 10 seconds, pluck four or five times, and
+allow each pluck to decay between notes.

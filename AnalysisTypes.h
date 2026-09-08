@@ -1,0 +1,41 @@
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+
+namespace bass
+{
+constexpr size_t kMaxPitchCandidates = 6;
+
+struct PitchCandidate
+{
+    float frequency_hz;
+    float score;
+    size_t lag;
+};
+
+struct SignalState
+{
+    float envelope;
+    float attack;
+    bool gate;
+    bool onset;
+};
+
+struct BassAnalysis
+{
+    uint32_t sequence;
+    uint32_t ms;
+    float raw_frequency_hz;
+    float tracked_frequency_hz;
+    float raw_confidence;
+    float tracked_confidence;
+    float envelope;
+    float attack;
+    bool gate;
+    bool pitch_valid;
+    bool onset;
+    PitchCandidate candidates[kMaxPitchCandidates];
+    size_t candidate_count;
+};
+} // namespace bass

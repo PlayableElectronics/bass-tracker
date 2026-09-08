@@ -2,7 +2,7 @@
 TARGET = BassAnalyzer
 
 # Sources
-CPP_SOURCES = BassAnalyzer.cpp
+CPP_SOURCES = BassAnalyzer.cpp PitchDetector.cpp PitchTracker.cpp EnvelopeFollower.cpp
 
 # Library Locations
 LIBDAISY_DIR = ../../DaisyExamples/libDaisy
