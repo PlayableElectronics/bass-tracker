@@ -18,6 +18,25 @@ completed pitch frame over USB serial.
 - harmonic/subharmonic evidence, temporal continuity and pitch hysteresis
 - separate onset/attack, signal-gate and pitch-valid states
 
+## Amplitude calibration
+
+The current provisional amplitude thresholds are centralized in
+`AnalysisConfig.h`:
+
+```text
+gate on:             0.000015
+gate off:            0.000008
+onset minimum:       0.000010
+pitch acquire:       0.000015
+pitch hold:          0.000008
+```
+
+They are based on the 2026-09-09 real-bass calibration capture, whose envelope
+was approximately 0.000019 median, 0.000020 at the 90th percentile, and
+0.000021 at the 95th percentile and maximum. That capture did not contain a
+labelled silence interval, so collect a silence capture before treating these
+values as final.
+
 The raw strongest autocorrelation candidate remains in the CSV output for
 debugging. `tracked_*` fields come from the candidate tracker; no MIDI-note
 quantization is performed.

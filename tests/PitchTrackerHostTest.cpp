@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cmath>
 
+#include "AnalysisConfig.h"
 #include "PitchTracker.h"
 
 namespace
@@ -34,9 +35,13 @@ int main()
     bass::PitchTracker calibrated_tracker;
     calibrated_tracker.Init();
     result = calibrated_tracker.Update(e_family, 2,
-                                       {0.0025f, 0.0f, true, false});
+                                       {bass::kGateOnThreshold, 0.0f, true, false});
     assert(result.valid);
     assert(Near(result.frequency_hz, 37.1f));
+
+    result = calibrated_tracker.Update(e_family, 2,
+                                       {bass::kGateOffThreshold, 0.0f, true, false});
+    assert(result.valid);
 
     result = tracker.Update(e_family, 2, {0.18f, 0.10f, true, false});
     assert(result.valid);

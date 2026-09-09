@@ -1,5 +1,6 @@
 #include <cmath>
 
+#include "AnalysisConfig.h"
 #include "PitchTracker.h"
 
 namespace bass
@@ -8,11 +9,6 @@ namespace
 {
 constexpr float kAcquireConfidence = 0.64f;
 constexpr float kHoldConfidence = 0.46f;
-// These match the calibrated signal-gate hysteresis.  Pitch acquisition has
-// its own hysteresis, but must not demand an envelope level the signal gate
-// can never reach on the present bass-input gain staging.
-constexpr float kAcquireEnvelope = 0.0025f;
-constexpr float kHoldEnvelope = 0.0015f;
 constexpr uint32_t kPitchHoldFrames = 9;
 constexpr uint32_t kWideContinuityFrames = 10;
 
