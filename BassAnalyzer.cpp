@@ -60,6 +60,10 @@ static float hop_filtered_sum_squares = 0.0f;
 static size_t hop_sample_count = 0;
 static bass::EnvelopeFollower envelope_follower;
 static bass::PitchTracker pitch_tracker;
+static volatile float monitor_frequency_hz = 0.0f;
+static volatile bool monitor_pitch_valid = false;
+static float monitor_phase = 0.0f;
+static float monitor_gain = 0.0f;
 
 // Logger::Print uses a 128-byte asynchronous buffer.  A full diagnostic CSV
 // record is larger than that, so sending it in Logger chunks corrupts records
@@ -82,11 +86,12 @@ class CsvUsbLogger
         buffer[length++] = '\r';
         buffer[length++] = '\n';
 
-        while(usb_.TransmitInternal(reinterpret_cast<uint8_t*>(buffer), length)
-              != UsbHandle::Result::OK)
-        {
-            System::DelayUs(50);
-        }
+        // CSV diagnostics must never stall pitch analysis. When USB is not
+        // being read, or a previous transfer is still active, drop this row
+        // and leave the current buffer untouched for the pending transfer.
+        if(usb_.TransmitInternal(reinterpret_cast<uint8_t*>(buffer), length)
+           != UsbHandle::Result::OK)
+            return;
         next_buffer_ = (next_buffer_ + 1) % kBufferCount;
     }
 
@@ -206,6 +211,8 @@ void AnalyzeBlock(const AnalysisBlock& block)
     result.tracked_frequency_hz = tracked.frequency_hz;
     result.tracked_confidence = tracked.confidence;
     result.pitch_valid = tracked.valid;
+    monitor_frequency_hz = tracked.frequency_hz;
+    monitor_pitch_valid = tracked.valid;
     PrintCsvRow(result);
 }
 
@@ -218,7 +225,24 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer in,
     {
         const float input = in[i];
         out[i] = input;
-        out[i + 1] = input;
+
+        const float target_gain = monitor_pitch_valid ? 0.15f : 0.0f;
+        monitor_gain += 0.002f * (target_gain - monitor_gain);
+
+        float freq = monitor_frequency_hz;
+        if(freq < 20.0f || freq > 500.0f)
+            freq = 0.0f;
+
+        if(freq > 0.0f)
+        {
+            monitor_phase += freq / kSampleRate;
+            if(monitor_phase >= 1.0f)
+                monitor_phase -= 1.0f;
+        }
+
+        const float sine = std::sin(2.0f * 3.14159265359f * monitor_phase)
+                           * monitor_gain;
+        out[i + 1] = sine;
         const float input_magnitude = std::fabs(input);
         if(input_magnitude > hop_input_peak)
             hop_input_peak = input_magnitude;
