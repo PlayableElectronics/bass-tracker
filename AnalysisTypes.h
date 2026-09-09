@@ -32,6 +32,10 @@ struct BassAnalysis
     float tracked_confidence;
     float envelope;
     float attack;
+    float input_peak;
+    float input_rms;
+    float filtered_peak;
+    float filtered_rms;
     bool gate;
     bool pitch_valid;
     bool onset;

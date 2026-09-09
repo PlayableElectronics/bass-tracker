@@ -1,8 +1,12 @@
 #include <cmath>
+#include <cstdarg>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 
 #include "daisy_seed.h"
+#include "hid/usb.h"
+#include "sys/system.h"
 
 #include "AnalysisTypes.h"
 #include "EnvelopeFollower.h"
@@ -27,6 +31,10 @@ struct AnalysisBlock
 {
     float samples[kAnalysisWindow];
     bass::SignalState signal;
+    float input_peak;
+    float input_rms;
+    float filtered_peak;
+    float filtered_rms;
     uint32_t sequence;
     uint32_t ms;
 };
@@ -45,8 +53,54 @@ static float dc_previous_output = 0.0f;
 static float lowpass_state = 0.0f;
 static float decimation_accumulator = 0.0f;
 static size_t decimation_count = 0;
+static float hop_input_peak = 0.0f;
+static float hop_input_sum_squares = 0.0f;
+static float hop_filtered_peak = 0.0f;
+static float hop_filtered_sum_squares = 0.0f;
+static size_t hop_sample_count = 0;
 static bass::EnvelopeFollower envelope_follower;
 static bass::PitchTracker pitch_tracker;
+
+// Logger::Print uses a 128-byte asynchronous buffer.  A full diagnostic CSV
+// record is larger than that, so sending it in Logger chunks corrupts records
+// when a USB transfer is still active.  These two buffers are alternated: when
+// the next transfer is accepted, the prior buffer is no longer in use by USB.
+class CsvUsbLogger
+{
+  public:
+    static void PrintLine(const char* format, ...)
+    {
+        char* buffer = buffers_[next_buffer_];
+        va_list args;
+        va_start(args, format);
+        const int written = std::vsnprintf(buffer, kBufferSize - 2, format, args);
+        va_end(args);
+
+        size_t length = written > 0 ? static_cast<size_t>(written) : 0;
+        if(length > kBufferSize - 2)
+            length = kBufferSize - 2;
+        buffer[length++] = '\r';
+        buffer[length++] = '\n';
+
+        while(usb_.TransmitInternal(reinterpret_cast<uint8_t*>(buffer), length)
+              != UsbHandle::Result::OK)
+        {
+            System::DelayUs(50);
+        }
+        next_buffer_ = (next_buffer_ + 1) % kBufferCount;
+    }
+
+  private:
+    static constexpr size_t kBufferCount = 2;
+    static constexpr size_t kBufferSize = 384;
+    static UsbHandle usb_;
+    static char buffers_[kBufferCount][kBufferSize];
+    static size_t next_buffer_;
+};
+
+UsbHandle CsvUsbLogger::usb_;
+char CsvUsbLogger::buffers_[CsvUsbLogger::kBufferCount][CsvUsbLogger::kBufferSize];
+size_t CsvUsbLogger::next_buffer_ = 0;
 
 float LowPassCoefficient()
 {
@@ -73,9 +127,10 @@ void ReleaseAnalysisBlock(int index)
 
 void PrintCsvHeader()
 {
-    hw.Print("seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,");
-    hw.Print("tracked_confidence,envelope,attack,gate,pitch_valid,onset,");
-    hw.PrintLine("c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score");
+    CsvUsbLogger::PrintLine("seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,"
+                            "tracked_confidence,envelope,attack,gate,pitch_valid,onset,"
+                            "input_peak,input_rms,filtered_peak,filtered_rms,"
+                            "c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score");
 }
 
 void PrintCsvRow(const bass::BassAnalysis& analysis)
@@ -90,26 +145,35 @@ void PrintCsvRow(const bass::BassAnalysis& analysis)
     const bass::PitchCandidate& c4 = analysis.candidate_count > 3
                                          ? analysis.candidates[3] : empty;
 
-    // libDaisy has a 128-byte logger buffer. Emit one CSV record in safe chunks.
-    hw.Print("%lu,%lu," FLT_FMT(2) "," FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 ",",
-             static_cast<unsigned long>(analysis.sequence),
-             static_cast<unsigned long>(analysis.ms),
-             FLT_VAR(2, analysis.raw_frequency_hz),
-             FLT_VAR(2, analysis.tracked_frequency_hz),
-             FLT_VAR3(analysis.raw_confidence),
-             FLT_VAR3(analysis.tracked_confidence),
-             FLT_VAR3(analysis.envelope));
-    hw.Print(FLT_FMT3 ",%d,%d,%d,",
-             FLT_VAR3(analysis.attack),
-             analysis.gate ? 1 : 0,
-             analysis.pitch_valid ? 1 : 0,
-             analysis.onset ? 1 : 0);
-    hw.Print(FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT(2) "," FLT_FMT3 ",",
-             FLT_VAR(2, c1.frequency_hz), FLT_VAR3(c1.score),
-             FLT_VAR(2, c2.frequency_hz), FLT_VAR3(c2.score));
-    hw.PrintLine(FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT(2) "," FLT_FMT3,
-                 FLT_VAR(2, c3.frequency_hz), FLT_VAR3(c3.score),
-                 FLT_VAR(2, c4.frequency_hz), FLT_VAR3(c4.score));
+    CsvUsbLogger::PrintLine(
+        "%lu,%lu," FLT_FMT(2) "," FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT3 ","
+        FLT_FMT(6) "," FLT_FMT(6) ",%d,%d,%d,"
+        FLT_FMT(6) "," FLT_FMT(6) "," FLT_FMT(6) "," FLT_FMT(6) ","
+        FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT(2) "," FLT_FMT3 ","
+        FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT(2) "," FLT_FMT3,
+        static_cast<unsigned long>(analysis.sequence),
+        static_cast<unsigned long>(analysis.ms),
+        FLT_VAR(2, analysis.raw_frequency_hz),
+        FLT_VAR(2, analysis.tracked_frequency_hz),
+        FLT_VAR3(analysis.raw_confidence),
+        FLT_VAR3(analysis.tracked_confidence),
+        FLT_VAR(6, analysis.envelope),
+        FLT_VAR(6, analysis.attack),
+        analysis.gate ? 1 : 0,
+        analysis.pitch_valid ? 1 : 0,
+        analysis.onset ? 1 : 0,
+        FLT_VAR(6, analysis.input_peak),
+        FLT_VAR(6, analysis.input_rms),
+        FLT_VAR(6, analysis.filtered_peak),
+        FLT_VAR(6, analysis.filtered_rms),
+        FLT_VAR(2, c1.frequency_hz),
+        FLT_VAR3(c1.score),
+        FLT_VAR(2, c2.frequency_hz),
+        FLT_VAR3(c2.score),
+        FLT_VAR(2, c3.frequency_hz),
+        FLT_VAR3(c3.score),
+        FLT_VAR(2, c4.frequency_hz),
+        FLT_VAR3(c4.score));
 }
 
 void AnalyzeBlock(const AnalysisBlock& block)
@@ -119,6 +183,10 @@ void AnalyzeBlock(const AnalysisBlock& block)
     result.ms = block.ms;
     result.envelope = block.signal.envelope;
     result.attack = block.signal.attack;
+    result.input_peak = block.input_peak;
+    result.input_rms = block.input_rms;
+    result.filtered_peak = block.filtered_peak;
+    result.filtered_rms = block.filtered_rms;
     result.gate = block.signal.gate;
     result.onset = block.signal.onset;
     result.candidate_count = bass::PitchDetector::Detect(block.samples,
@@ -151,12 +219,21 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer in,
         const float input = in[i];
         out[i] = input;
         out[i + 1] = input;
+        const float input_magnitude = std::fabs(input);
+        if(input_magnitude > hop_input_peak)
+            hop_input_peak = input_magnitude;
+        hop_input_sum_squares += input * input;
+        ++hop_sample_count;
 
         const float dc_blocked = input - dc_previous_input
                                  + kDcCoefficient * dc_previous_output;
         dc_previous_input = input;
         dc_previous_output = dc_blocked;
         lowpass_state += lowpass_coefficient * (dc_blocked - lowpass_state);
+        const float filtered_magnitude = std::fabs(lowpass_state);
+        if(filtered_magnitude > hop_filtered_peak)
+            hop_filtered_peak = filtered_magnitude;
+        hop_filtered_sum_squares += lowpass_state * lowpass_state;
         envelope_follower.Process(lowpass_state);
 
         decimation_accumulator += lowpass_state;
@@ -175,29 +252,42 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer in,
             continue;
 
         ++produced_sequence;
-        if(ready_buffer >= 0)
-            continue;
-
-        int candidate = -1;
-        for(int i = 0; i < static_cast<int>(kBufferCount); ++i)
+        if(ready_buffer < 0)
         {
-            if(i != processing_buffer)
+            int candidate = -1;
+            for(int i = 0; i < static_cast<int>(kBufferCount); ++i)
             {
-                candidate = i;
-                break;
+                if(i != processing_buffer)
+                {
+                    candidate = i;
+                    break;
+                }
+            }
+            if(candidate >= 0)
+            {
+                AnalysisBlock& block = analysis_buffers[candidate];
+                for(size_t i = 0; i < kAnalysisWindow; ++i)
+                    block.samples[i] = analysis_ring[(ring_write + i) % kAnalysisWindow];
+                block.signal = envelope_follower.ConsumeState();
+                block.input_peak = hop_input_peak;
+                block.input_rms = hop_sample_count > 0
+                                      ? std::sqrt(hop_input_sum_squares / hop_sample_count)
+                                      : 0.0f;
+                block.filtered_peak = hop_filtered_peak;
+                block.filtered_rms = hop_sample_count > 0
+                                         ? std::sqrt(hop_filtered_sum_squares / hop_sample_count)
+                                         : 0.0f;
+                block.sequence = produced_sequence;
+                block.ms = static_cast<uint32_t>((static_cast<uint64_t>(decimated_samples)
+                                                  * 1000u) / kAnalysisRate);
+                ready_buffer = candidate;
             }
         }
-        if(candidate < 0)
-            continue;
-
-        AnalysisBlock& block = analysis_buffers[candidate];
-        for(size_t i = 0; i < kAnalysisWindow; ++i)
-            block.samples[i] = analysis_ring[(ring_write + i) % kAnalysisWindow];
-        block.signal = envelope_follower.ConsumeState();
-        block.sequence = produced_sequence;
-        block.ms = static_cast<uint32_t>((static_cast<uint64_t>(decimated_samples)
-                                          * 1000u) / kAnalysisRate);
-        ready_buffer = candidate;
+        hop_input_peak = 0.0f;
+        hop_input_sum_squares = 0.0f;
+        hop_filtered_peak = 0.0f;
+        hop_filtered_sum_squares = 0.0f;
+        hop_sample_count = 0;
     }
 }
 } // namespace

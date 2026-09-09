@@ -10,11 +10,11 @@ constexpr float kEnvelopeAttackSeconds = 0.0015f;
 constexpr float kEnvelopeReleaseSeconds = 0.080f;
 constexpr float kAttackDecaySeconds = 0.030f;
 constexpr float kAttackSlopeGain = 250.0f;
-constexpr float kGateOnThreshold = 0.012f;
-constexpr float kGateOffThreshold = 0.008f;
+constexpr float kGateOnThreshold = 0.0025f;
+constexpr float kGateOffThreshold = 0.0015f;
 constexpr float kOnsetThreshold = 0.18f;
 constexpr float kOnsetRearmThreshold = 0.08f;
-constexpr float kOnsetMinimumEnvelope = 0.010f;
+constexpr float kOnsetMinimumEnvelope = 0.0015f;
 constexpr float kGateReleaseSeconds = 0.015f;
 constexpr float kOnsetRearmSeconds = 0.040f;
 

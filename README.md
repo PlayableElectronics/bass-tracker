@@ -60,7 +60,7 @@ The two lines printed by libDaisy while USB logging starts are non-CSV. All
 subsequent analysis lines use this header:
 
 ```text
-seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,tracked_confidence,envelope,attack,gate,pitch_valid,onset,c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score
+seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,tracked_confidence,envelope,attack,gate,pitch_valid,onset,input_peak,input_rms,filtered_peak,filtered_rms,c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score
 ```
 
 Use a suitable instrument input, buffer or DI/preamp for a passive bass
@@ -76,7 +76,7 @@ python3 tools/capture.py /dev/ttyACM0 open_E --duration 10
 
 The capture script creates a timestamped file in `captures/`, adds a `label`
 column, skips startup text and malformed rows, and handles `Ctrl-C` cleanly.
-Captures are intentionally ignored by Git.
+CSV captures are tracked in Git for later offline analysis.
 
 Recommended labelled captures:
 
