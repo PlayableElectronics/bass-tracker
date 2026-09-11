@@ -1,0 +1,12 @@
+{
+  "baseline": false,
+  "name": "attack_strategy_B",
+  "description": "Very quiet while acquiring, then 10 ms fade after trust; bypass a continuous pitch motion.",
+  "strategy": "fade",
+  "confirmation_frames": 2,
+  "fade_ms": 10.0,
+  "quiet_gain": 0.1,
+  "hold_connected_pitch": false,
+  "enable_connected_rise": false,
+  "bypass_continuous_motion": true
+}

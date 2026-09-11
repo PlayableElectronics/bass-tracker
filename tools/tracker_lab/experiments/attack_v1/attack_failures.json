@@ -1,0 +1,70 @@
+[
+  {
+    "start_sec": 176.50133333333332,
+    "end_sec": 176.53333333333333,
+    "duration_sec": 0.04266666666666667,
+    "weighted_error_cent_seconds": 42.00165966597747,
+    "max_error_cents": 1153.4132057642234,
+    "onset": 0,
+    "envelope": 0.03387755900621414,
+    "base_synth_gain": 1.0,
+    "raw_candidates_hz": [
+      {
+        "frequency_hz": 61.855670103092784,
+        "score": 0.9899901747703552
+      },
+      {
+        "frequency_hz": 30.927835051546392,
+        "score": 0.9731850624084473
+      },
+      {
+        "frequency_hz": 123.71134020618557,
+        "score": 0.9218090176582336
+      },
+      {
+        "frequency_hz": 41.23711340206186,
+        "score": 0.91843581199646
+      }
+    ],
+    "pre_stability_freq_hz": 92.78590267912153,
+    "final_tracked_freq_hz": 92.78590267912153,
+    "reference_freq_hz": 61.557220667245815,
+    "tracker_confidence": 0.9218090176582336,
+    "family_promoted": 1,
+    "stability_bypass": 1
+  },
+  {
+    "start_sec": 152.97066666666666,
+    "end_sec": 152.97066666666666,
+    "duration_sec": 0.010666666666666668,
+    "weighted_error_cent_seconds": 1.0888990300431853,
+    "max_error_cents": 102.08428406654862,
+    "onset": 0,
+    "envelope": 0.055429890751838684,
+    "base_synth_gain": 1.0,
+    "raw_candidates_hz": [
+      {
+        "frequency_hz": 46.875,
+        "score": 0.983169436454773
+      },
+      {
+        "frequency_hz": 31.413612565445025,
+        "score": 0.23263750970363617
+      },
+      {
+        "frequency_hz": 36.474164133738604,
+        "score": 0.16084742546081543
+      },
+      {
+        "frequency_hz": 169.01408450704224,
+        "score": 0.12234114110469818
+      }
+    ],
+    "pre_stability_freq_hz": 44.49133920608337,
+    "final_tracked_freq_hz": 44.49133920608337,
+    "reference_freq_hz": 47.19371563408467,
+    "tracker_confidence": 0.983169436454773,
+    "family_promoted": 0,
+    "stability_bypass": 1
+  }
+]
