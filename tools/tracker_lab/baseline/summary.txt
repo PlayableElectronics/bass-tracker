@@ -1,0 +1,54 @@
+duration_sec: 581.5237083333334
+total_frames: 54514
+voiced_duration_sec: 131.22133333333335
+tracker_valid_duration_sec: 420.7893333333334
+pitch_coverage: 1.0
+median_absolute_cents_error: 8.041273558698467
+p90_absolute_cents_error: 1207.0977570410746
+within_25_cents: 0.6268086490001625
+within_50_cents: 0.6294098520565762
+octave_up_frames: 0
+octave_down_frames: 4335
+dropout_frames: 0
+false_positive_frames: 27147
+large_pitch_error_frames: 43
+pitch_jump_count: 134
+longest_stable_correct_sec: 3.242666666666667
+octave_up_duration_sec: 0.0
+octave_down_duration_sec: 46.24000000000001
+acquisition_event_count: 614
+median_acquisition_latency_sec: 0.0
+p90_acquisition_latency_sec: 0.0
+latency_method: reference voiced onset to first valid tracker frame within 100 cents
+
+Failure events (first 30):
+0.117s false_positive ref=0.00 tracked=37.85
+0.128s false_positive ref=0.00 tracked=37.71
+0.139s false_positive ref=0.00 tracked=37.10
+0.149s false_positive ref=0.00 tracked=37.10
+0.160s false_positive ref=0.00 tracked=37.10
+0.171s false_positive ref=0.00 tracked=37.10
+0.181s false_positive ref=0.00 tracked=37.10
+0.192s false_positive ref=0.00 tracked=41.44
+0.203s false_positive ref=0.00 tracked=44.03
+0.213s false_positive ref=0.00 tracked=43.80
+0.224s false_positive ref=0.00 tracked=43.40
+0.235s false_positive ref=0.00 tracked=42.86
+0.245s false_positive ref=0.00 tracked=43.88
+0.256s false_positive ref=0.00 tracked=50.90
+0.267s false_positive ref=0.00 tracked=50.90
+0.277s false_positive ref=0.00 tracked=50.90
+0.288s false_positive ref=0.00 tracked=50.90
+0.299s false_positive ref=0.00 tracked=43.04
+0.309s false_positive ref=25.00 tracked=45.37
+0.320s false_positive ref=25.00 tracked=46.63
+0.331s false_positive ref=25.00 tracked=46.63
+0.341s false_positive ref=25.00 tracked=44.92
+0.352s false_positive ref=25.00 tracked=44.92
+0.363s false_positive ref=25.00 tracked=44.92
+0.373s false_positive ref=0.00 tracked=44.92
+0.384s false_positive ref=0.00 tracked=39.94
+0.395s false_positive ref=0.00 tracked=36.60
+0.405s false_positive ref=0.00 tracked=45.00
+0.416s false_positive ref=0.00 tracked=50.93
+0.427s false_positive ref=0.00 tracked=46.01
