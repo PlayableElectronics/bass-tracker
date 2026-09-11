@@ -28,6 +28,7 @@ struct BassAnalysis
     uint32_t ms;
     float raw_frequency_hz;
     float tracked_frequency_hz;
+    float pre_stability_frequency_hz;
     float raw_confidence;
     float tracked_confidence;
     float envelope;
@@ -39,6 +40,8 @@ struct BassAnalysis
     bool gate;
     bool pitch_valid;
     bool onset;
+    bool family_promoted;
+    bool stability_bypass;
     PitchCandidate candidates[kMaxPitchCandidates];
     size_t candidate_count;
 };

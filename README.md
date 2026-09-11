@@ -79,7 +79,7 @@ The two lines printed by libDaisy while USB logging starts are non-CSV. All
 subsequent analysis lines use this header:
 
 ```text
-seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,tracked_confidence,envelope,attack,gate,pitch_valid,onset,input_peak,input_rms,filtered_peak,filtered_rms,c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score
+seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,tracked_confidence,envelope,attack,gate,pitch_valid,onset,input_peak,input_rms,filtered_peak,filtered_rms,c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score,pre_stability_freq_hz,final_tracked_freq_hz,family_promoted,stability_bypass
 ```
 
 Use a suitable instrument input, buffer or DI/preamp for a passive bass

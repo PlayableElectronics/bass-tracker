@@ -135,7 +135,8 @@ void PrintCsvHeader()
     CsvUsbLogger::PrintLine("seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,"
                             "tracked_confidence,envelope,attack,gate,pitch_valid,onset,"
                             "input_peak,input_rms,filtered_peak,filtered_rms,"
-                            "c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score");
+                            "c1_freq,c1_score,c2_freq,c2_score,c3_freq,c3_score,c4_freq,c4_score,"
+                            "pre_stability_freq_hz,final_tracked_freq_hz,family_promoted,stability_bypass");
 }
 
 void PrintCsvRow(const bass::BassAnalysis& analysis)
@@ -155,7 +156,8 @@ void PrintCsvRow(const bass::BassAnalysis& analysis)
         FLT_FMT(6) "," FLT_FMT(6) ",%d,%d,%d,"
         FLT_FMT(6) "," FLT_FMT(6) "," FLT_FMT(6) "," FLT_FMT(6) ","
         FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT(2) "," FLT_FMT3 ","
-        FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT(2) "," FLT_FMT3,
+        FLT_FMT(2) "," FLT_FMT3 "," FLT_FMT(2) "," FLT_FMT3 ","
+        FLT_FMT(2) "," FLT_FMT(2) ",%d,%d",
         static_cast<unsigned long>(analysis.sequence),
         static_cast<unsigned long>(analysis.ms),
         FLT_VAR(2, analysis.raw_frequency_hz),
@@ -178,7 +180,11 @@ void PrintCsvRow(const bass::BassAnalysis& analysis)
         FLT_VAR(2, c3.frequency_hz),
         FLT_VAR3(c3.score),
         FLT_VAR(2, c4.frequency_hz),
-        FLT_VAR3(c4.score));
+        FLT_VAR3(c4.score),
+        FLT_VAR(2, analysis.pre_stability_frequency_hz),
+        FLT_VAR(2, analysis.tracked_frequency_hz),
+        analysis.family_promoted ? 1 : 0,
+        analysis.stability_bypass ? 1 : 0);
 }
 
 void AnalyzeBlock(const AnalysisBlock& block)
@@ -209,8 +215,11 @@ void AnalyzeBlock(const AnalysisBlock& block)
                                                                  result.candidate_count,
                                                                  block.signal);
     result.tracked_frequency_hz = tracked.frequency_hz;
+    result.pre_stability_frequency_hz = tracked.pre_stability_frequency_hz;
     result.tracked_confidence = tracked.confidence;
     result.pitch_valid = tracked.valid;
+    result.family_promoted = tracked.family_promoted;
+    result.stability_bypass = tracked.stability_bypass;
     monitor_frequency_hz = tracked.frequency_hz;
     monitor_pitch_valid = tracked.valid;
     PrintCsvRow(result);
