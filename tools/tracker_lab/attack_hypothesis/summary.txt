@@ -1,0 +1,12 @@
+Attack hypothesis analysis — frozen stability_v1 trajectory
+
+attacks: 233 total; 55 usable high-confidence reference; 178 excluded as reference-uncertain.
+first credible vs settled reference: ±10 6/55 (10.9%); ±25 12/55 (21.8%); ±50 18/55 (32.7%).
+peak vs settled reference: ±10 15/55 (27.3%); ±25 24/55 (43.6%); ±50 37/55 (67.3%).
+first closer than peak: 1/55 (1.8%); peak closer: 34/55 (61.8%); approximately equal: 20/55 (36.4%).
+patterns: A=0, B=10, C=18, D=27, E=178.
+among 10 reference-supported peak errors ≥100 cents, settled reference present in top four candidates: 9 (90.0%).
+tracker-target cross-check usable attacks: 209.
+any large error in the full 200 ms attack window: 31/55 (56.4%); first close then later large error: 2 (3.6%).
+
+Definitions: first credible = pitch-valid, positive frozen tracked frequency, confidence ≥0.46. Settled = median from 80–180 ms after the onset; reference requires ≥4 pYIN-voiced frames at confidence ≥0.30. Pattern A requires first ≤50 cents and peak ≥100 cents from settled reference.
