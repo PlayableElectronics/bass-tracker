@@ -1,0 +1,193 @@
+{
+  "baseline": {
+    "octave_down_duration_sec": 46.24000000000001,
+    "octave_up_duration_sec": 0.0,
+    "median_absolute_cents_error": 8.041273558698467,
+    "p90_absolute_cents_error": 1207.0977570410746,
+    "within_25_cents": 0.6268086490001625,
+    "within_50_cents": 0.6294098520565762,
+    "dropout_frames": 0,
+    "pitch_jump_count": 134,
+    "pitch_coverage": 1.0,
+    "longest_stable_correct_sec": 3.242666666666667
+  },
+  "best": {
+    "octave_down_duration_sec": 1.9520000000000002,
+    "octave_up_duration_sec": 0.544,
+    "median_absolute_cents_error": 5.109195874756878,
+    "p90_absolute_cents_error": 12.34270899449643,
+    "within_25_cents": 0.9446431474556982,
+    "within_50_cents": 0.959031051861486,
+    "dropout_frames": 0,
+    "pitch_jump_count": 292,
+    "pitch_coverage": 1.0,
+    "longest_stable_correct_sec": 3.3600000000000003
+  },
+  "delta_best_minus_baseline": {
+    "octave_down_duration_sec": -44.28800000000001,
+    "octave_up_duration_sec": 0.544,
+    "median_absolute_cents_error": -2.932077683941589,
+    "p90_absolute_cents_error": -1194.7550480465782,
+    "within_25_cents": 0.3178344984555357,
+    "within_50_cents": 0.3296211998049098,
+    "dropout_frames": 0,
+    "pitch_jump_count": 158,
+    "pitch_coverage": 0.0,
+    "longest_stable_correct_sec": 0.11733333333333329
+  },
+  "frequency_bands": {
+    "best": {
+      "25-50": {
+        "duration_sec": 75.01866666666668,
+        "total_frames": 7033,
+        "voiced_duration_sec": 75.01866666666668,
+        "tracker_valid_duration_sec": 75.01866666666668,
+        "pitch_coverage": 1.0,
+        "median_absolute_cents_error": 4.746612359818105,
+        "p90_absolute_cents_error": 10.022803885355668,
+        "within_25_cents": 0.981089151144604,
+        "within_50_cents": 0.9913266031565477,
+        "octave_up_frames": 31,
+        "octave_down_frames": 0,
+        "dropout_frames": 0,
+        "false_positive_frames": 0,
+        "large_pitch_error_frames": 30,
+        "pitch_jump_count": 1,
+        "longest_stable_correct_sec": 13.109333333333336,
+        "octave_up_duration_sec": 0.3306666666666667,
+        "octave_down_duration_sec": 0.0,
+        "acquisition_event_count": 1,
+        "median_acquisition_latency_sec": 0.0,
+        "p90_acquisition_latency_sec": 0.0,
+        "latency_method": "reference voiced onset to first valid tracker frame within 100 cents",
+        "reference_band_hz": "25-50"
+      },
+      "50-75": {
+        "duration_sec": 36.565333333333335,
+        "total_frames": 3428,
+        "voiced_duration_sec": 36.565333333333335,
+        "tracker_valid_duration_sec": 36.565333333333335,
+        "pitch_coverage": 1.0,
+        "median_absolute_cents_error": 5.592764203152583,
+        "p90_absolute_cents_error": 14.048696170978802,
+        "within_25_cents": 0.9434072345390898,
+        "within_50_cents": 0.9667444574095683,
+        "octave_up_frames": 20,
+        "octave_down_frames": 0,
+        "dropout_frames": 0,
+        "false_positive_frames": 0,
+        "large_pitch_error_frames": 94,
+        "pitch_jump_count": 10,
+        "longest_stable_correct_sec": 10.474666666666668,
+        "octave_up_duration_sec": 0.21333333333333337,
+        "octave_down_duration_sec": 0.0,
+        "acquisition_event_count": 1,
+        "median_acquisition_latency_sec": 0.0,
+        "p90_acquisition_latency_sec": 0.0,
+        "latency_method": "reference voiced onset to first valid tracker frame within 100 cents",
+        "reference_band_hz": "50-75"
+      },
+      "75-110": {
+        "duration_sec": 18.741333333333337,
+        "total_frames": 1757,
+        "voiced_duration_sec": 18.741333333333337,
+        "tracker_valid_duration_sec": 18.741333333333337,
+        "pitch_coverage": 1.0,
+        "median_absolute_cents_error": 4.779196965454326,
+        "p90_absolute_cents_error": 1191.9045985091464,
+        "within_25_cents": 0.8184405236198065,
+        "within_50_cents": 0.829823562891292,
+        "octave_up_frames": 0,
+        "octave_down_frames": 179,
+        "dropout_frames": 0,
+        "false_positive_frames": 0,
+        "large_pitch_error_frames": 116,
+        "pitch_jump_count": 21,
+        "longest_stable_correct_sec": 2.8693333333333335,
+        "octave_up_duration_sec": 0.0,
+        "octave_down_duration_sec": 1.9093333333333335,
+        "acquisition_event_count": 1,
+        "median_acquisition_latency_sec": 0.2666666666666667,
+        "p90_acquisition_latency_sec": 0.2666666666666667,
+        "latency_method": "reference voiced onset to first valid tracker frame within 100 cents",
+        "reference_band_hz": "75-110"
+      },
+      "110-200": {
+        "duration_sec": 0.8640000000000001,
+        "total_frames": 81,
+        "voiced_duration_sec": 0.8640000000000001,
+        "tracker_valid_duration_sec": 0.8640000000000001,
+        "pitch_coverage": 1.0,
+        "median_absolute_cents_error": 8.37165276452079,
+        "p90_absolute_cents_error": 889.0434854274628,
+        "within_25_cents": 0.6049382716049383,
+        "within_50_cents": 0.6666666666666666,
+        "octave_up_frames": 0,
+        "octave_down_frames": 4,
+        "dropout_frames": 0,
+        "false_positive_frames": 0,
+        "large_pitch_error_frames": 22,
+        "pitch_jump_count": 7,
+        "longest_stable_correct_sec": 0.2026666666666667,
+        "octave_up_duration_sec": 0.0,
+        "octave_down_duration_sec": 0.04266666666666667,
+        "acquisition_event_count": 1,
+        "median_acquisition_latency_sec": 0.032,
+        "p90_acquisition_latency_sec": 0.032,
+        "latency_method": "reference voiced onset to first valid tracker frame within 100 cents",
+        "reference_band_hz": "110-200"
+      },
+      "200-500": {
+        "reference_band_hz": "200-500"
+      }
+    }
+  },
+  "holdout": {
+    "best": {
+      "duration_sec": 300.00000000000006,
+      "total_frames": 28125,
+      "voiced_duration_sec": 69.73866666666667,
+      "tracker_valid_duration_sec": 212.94933333333336,
+      "pitch_coverage": 1.0,
+      "median_absolute_cents_error": 5.203991777693899,
+      "p90_absolute_cents_error": 11.724075553801962,
+      "within_25_cents": 0.9652799021107372,
+      "within_50_cents": 0.9775160599571735,
+      "octave_up_frames": 41,
+      "octave_down_frames": 2,
+      "dropout_frames": 0,
+      "false_positive_frames": 13426,
+      "large_pitch_error_frames": 104,
+      "pitch_jump_count": 193,
+      "longest_stable_correct_sec": 2.8373333333333335,
+      "octave_up_duration_sec": 0.4373333333333334,
+      "octave_down_duration_sec": 0.021333333333333336,
+      "acquisition_event_count": 439,
+      "median_acquisition_latency_sec": 0.0,
+      "p90_acquisition_latency_sec": 0.0,
+      "latency_method": "reference voiced onset to first valid tracker frame within 100 cents",
+      "intervals_sec": [
+        [
+          20,
+          60
+        ],
+        [
+          120,
+          180
+        ],
+        [
+          220,
+          280
+        ],
+        [
+          320,
+          380
+        ],
+        [
+          440,
+          520
+        ]
+      ]
+    }
+  }
+}

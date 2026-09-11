@@ -1,0 +1,56 @@
+{
+  "source": "basik hehe.wav",
+  "purpose": "Short causal-regression sections used before full-recording validation. Times are absolute source seconds.",
+  "slices": [
+    {
+      "name": "bad_octave_74s",
+      "start_sec": 70.0,
+      "duration_sec": 10.0,
+      "role": "development",
+      "expectation": "Includes the 74.048-77.269 s octave-down passage."
+    },
+    {
+      "name": "bad_octave_88s",
+      "start_sec": 84.0,
+      "duration_sec": 10.0,
+      "role": "development",
+      "expectation": "Includes the 88.032-90.635 s octave-down passage."
+    },
+    {
+      "name": "bad_octave_295s",
+      "start_sec": 290.0,
+      "duration_sec": 12.0,
+      "role": "development",
+      "expectation": "Includes the 294.987-298.336 s 62 Hz octave-down passage."
+    },
+    {
+      "name": "good_low_46hz",
+      "start_sec": 66.0,
+      "duration_sec": 3.0,
+      "role": "regression",
+      "expectation": "Sustained correct low-46 Hz playing."
+    },
+    {
+      "name": "good_low_47hz",
+      "start_sec": 248.0,
+      "duration_sec": 6.0,
+      "role": "regression",
+      "expectation": "Long correct low-47 Hz region."
+    },
+    {
+      "name": "good_low_55hz",
+      "start_sec": 260.0,
+      "duration_sec": 5.0,
+      "role": "regression",
+      "expectation": "Long correct low-55 Hz region."
+    },
+    {
+      "name": "slide_160s",
+      "start_sec": 159.0,
+      "duration_sec": 3.0,
+      "role": "regression",
+      "expectation": "Reference trajectory contains a continuous 56-to-55 Hz movement near 159.8 s."
+    }
+  ],
+  "holdout_intervals_sec": [[20, 60], [120, 180], [220, 280], [320, 380], [440, 520]]
+}
