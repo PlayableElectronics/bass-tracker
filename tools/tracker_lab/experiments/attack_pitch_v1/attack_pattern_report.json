@@ -1,0 +1,1167 @@
+[
+  {
+    "start_sec": 176.50133333333332,
+    "end_sec": 176.53333333333333,
+    "duration_sec": 0.04266666666666667,
+    "maximum_error_cents": 1153.4132057642234,
+    "pattern": "A_correct_wrong_correct__E_supported_old_candidate",
+    "context": [
+      {
+        "time_sec": 176.45866666666666,
+        "onset": 0,
+        "input_envelope": 0.04609455540776253,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 61.88873940629777,
+        "tracked_frequency_hz": 61.88873940629777,
+        "reference_frequency_hz": 62.08174499775328,
+        "error_cents": 5.390607662135013,
+        "tracker_confidence": 0.9586678743362427,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9586678743362427
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9373449683189392
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8279439806938171
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.8088430166244507
+          }
+        ]
+      },
+      {
+        "time_sec": 176.46933333333334,
+        "onset": 0,
+        "input_envelope": 0.041780710220336914,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 61.872204754695275,
+        "tracked_frequency_hz": 61.872204754695275,
+        "reference_frequency_hz": 62.27248111794115,
+        "error_cents": 11.163981214280229,
+        "tracker_confidence": 0.9527350068092346,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9527350068092346
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9259448647499084
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.8873727321624756
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8440694212913513
+          }
+        ]
+      },
+      {
+        "time_sec": 176.48,
+        "onset": 0,
+        "input_envelope": 0.03906600922346115,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 61.86393742889403,
+        "tracked_frequency_hz": 61.86393742889403,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 8.604676904672822,
+        "tracker_confidence": 0.9666429162025452,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9666429162025452
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9512003064155579
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8378920555114746
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.8344711065292358
+          }
+        ]
+      },
+      {
+        "time_sec": 176.49066666666667,
+        "onset": 0,
+        "input_envelope": 0.03647780790925026,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 61.86046515205751,
+        "tracked_frequency_hz": 61.86237488019917,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 8.560949140488631,
+        "tracker_confidence": 0.9701479077339172,
+        "family_promoted": 0,
+        "stability_mode": "stable",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9701479077339172
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9314699769020081
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8940654397010803
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.870811939239502
+          }
+        ]
+      },
+      {
+        "time_sec": 176.50133333333332,
+        "onset": 0,
+        "input_envelope": 0.03387755900621414,
+        "raw_frequency_hz": 123.71134020618557,
+        "pre_stability_frequency_hz": 92.78590267912153,
+        "tracked_frequency_hz": 92.78590267912153,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 710.373039456832,
+        "tracker_confidence": 0.9218090176582336,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9899901747703552
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9731850624084473
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9218090176582336
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.91843581199646
+          }
+        ]
+      },
+      {
+        "time_sec": 176.512,
+        "onset": 0,
+        "input_envelope": 0.03190194070339203,
+        "raw_frequency_hz": 123.71134020618557,
+        "pre_stability_frequency_hz": 108.24862144265356,
+        "tracked_frequency_hz": 108.24862144265356,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 977.218382638811,
+        "tracker_confidence": 0.9239915013313293,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9901873469352722
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.966626763343811
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9239915013313293
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.914219856262207
+          }
+        ]
+      },
+      {
+        "time_sec": 176.52266666666668,
+        "onset": 0,
+        "input_envelope": 0.03158081695437431,
+        "raw_frequency_hz": 123.71134020618557,
+        "pre_stability_frequency_hz": 115.97998082441956,
+        "tracked_frequency_hz": 115.97998082441956,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 1096.6509658255206,
+        "tracker_confidence": 0.9244489669799805,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9920842051506042
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9875118136405945
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9244489669799805
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.9230005145072937
+          }
+        ]
+      },
+      {
+        "time_sec": 176.53333333333333,
+        "onset": 0,
+        "input_envelope": 0.030321933329105377,
+        "raw_frequency_hz": 123.71134020618557,
+        "pre_stability_frequency_hz": 119.84566051530257,
+        "tracked_frequency_hz": 119.84566051530257,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 1153.4132057642234,
+        "tracker_confidence": 0.9203329086303711,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9905035495758057
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9898090958595276
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.9292585253715515
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9203329086303711
+          }
+        ]
+      },
+      {
+        "time_sec": 176.544,
+        "onset": 0,
+        "input_envelope": 0.029801705852150917,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 95.48986454217446,
+        "tracked_frequency_hz": 95.48986454217446,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 760.1034195165392,
+        "tracker_confidence": 0.9918580055236816,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9918580055236816
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9916594624519348
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9098993539810181
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.9088090658187866
+          }
+        ]
+      },
+      {
+        "time_sec": 176.55466666666666,
+        "onset": 0,
+        "input_envelope": 0.029411954805254936,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 78.67276732263362,
+        "tracked_frequency_hz": 78.67276732263362,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 424.7234838656847,
+        "tracker_confidence": 0.9942991137504578,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9942991137504578
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9882969260215759
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9129579663276672
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.9044982194900513
+          }
+        ]
+      },
+      {
+        "time_sec": 176.56533333333334,
+        "onset": 0,
+        "input_envelope": 0.02767948806285858,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 71.60958649042647,
+        "tracked_frequency_hz": 71.60958649042647,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 261.86956972163216,
+        "tracker_confidence": 0.9944925904273987,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9944925904273987
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.989151656627655
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.921760618686676
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9215096831321716
+          }
+        ]
+      },
+      {
+        "time_sec": 176.576,
+        "onset": 0,
+        "input_envelope": 0.02717704325914383,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 67.51294160774631,
+        "tracked_frequency_hz": 67.51294160774631,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 159.88318213031442,
+        "tracker_confidence": 0.993100643157959,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.993100643157959
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.984431266784668
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9098827242851257
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.8983892202377319
+          }
+        ]
+      },
+      {
+        "time_sec": 176.58666666666667,
+        "onset": 0,
+        "input_envelope": 0.026600541546940804,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 64.68430585541955,
+        "tracked_frequency_hz": 64.68430585541955,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 85.78514800955442,
+        "tracker_confidence": 0.9920311570167542,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9920311570167542
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9847859740257263
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8988787531852722
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.8883687257766724
+          }
+        ]
+      },
+      {
+        "time_sec": 176.59733333333332,
+        "onset": 0,
+        "input_envelope": 0.025685379281640053,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 63.26998797925617,
+        "tracked_frequency_hz": 63.26998797925617,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 47.51187223919564,
+        "tracker_confidence": 0.9910671710968018,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9913845658302307
+          },
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9910671710968018
+          },
+          {
+            "frequency_hz": 41.0958904109589,
+            "score": 0.9079541563987732
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9015547633171082
+          }
+        ]
+      },
+      {
+        "time_sec": 176.608,
+        "onset": 0,
+        "input_envelope": 0.025508534163236618,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 62.56282904117448,
+        "tracked_frequency_hz": 62.56282904117448,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 28.053188100884302,
+        "tracker_confidence": 0.9924173951148987,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9924173951148987
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9912877678871155
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8952644467353821
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.8951098918914795
+          }
+        ]
+      },
+      {
+        "time_sec": 176.61866666666666,
+        "onset": 0,
+        "input_envelope": 0.024909639731049538,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 62.20924957213363,
+        "tracked_frequency_hz": 62.20924957213363,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 18.24120995289272,
+        "tracker_confidence": 0.9949140548706055,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9949140548706055
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9869236350059509
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8851994276046753
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.8711749315261841
+          }
+        ]
+      },
+      {
+        "time_sec": 176.62933333333334,
+        "onset": 0,
+        "input_envelope": 0.024251753464341164,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 62.0324598376132,
+        "tracked_frequency_hz": 62.0324598376132,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 13.314287811314731,
+        "tracker_confidence": 0.9953073859214783,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9953073859214783
+          },
+          {
+            "frequency_hz": 30.848329048843187,
+            "score": 0.9924496412277222
+          },
+          {
+            "frequency_hz": 41.0958904109589,
+            "score": 0.9166160225868225
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9123063087463379
+          }
+        ]
+      },
+      {
+        "time_sec": 176.64,
+        "onset": 0,
+        "input_envelope": 0.02352730929851532,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 61.944064970353,
+        "tracked_frequency_hz": 61.944064970353,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 10.845558668717786,
+        "tracker_confidence": 0.9932325482368469,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9932325482368469
+          },
+          {
+            "frequency_hz": 30.848329048843187,
+            "score": 0.9864847660064697
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.9001675844192505
+          },
+          {
+            "frequency_hz": 41.0958904109589,
+            "score": 0.8887884020805359
+          }
+        ]
+      },
+      {
+        "time_sec": 176.65066666666667,
+        "onset": 0,
+        "input_envelope": 0.022338347509503365,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 61.899867536722894,
+        "tracked_frequency_hz": 61.899867536722894,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 9.609872693938673,
+        "tracker_confidence": 0.9923200011253357,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9923200011253357
+          },
+          {
+            "frequency_hz": 30.927835051546392,
+            "score": 0.9846956133842468
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8843855261802673
+          },
+          {
+            "frequency_hz": 41.23711340206186,
+            "score": 0.8655470609664917
+          }
+        ]
+      },
+      {
+        "time_sec": 176.66133333333335,
+        "onset": 0,
+        "input_envelope": 0.022924145683646202,
+        "raw_frequency_hz": 61.855670103092784,
+        "pre_stability_frequency_hz": 61.87776881990784,
+        "tracked_frequency_hz": 61.87776881990784,
+        "reference_frequency_hz": 61.557220667245815,
+        "error_cents": 8.991698805286136,
+        "tracker_confidence": 0.9908466935157776,
+        "family_promoted": 1,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 30.848329048843187,
+            "score": 0.993698000907898
+          },
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.9908466935157776
+          },
+          {
+            "frequency_hz": 41.0958904109589,
+            "score": 0.9017816781997681
+          },
+          {
+            "frequency_hz": 123.71134020618557,
+            "score": 0.8974546790122986
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "start_sec": 152.97066666666666,
+    "end_sec": 152.97066666666666,
+    "duration_sec": 0.010666666666666668,
+    "maximum_error_cents": 102.08428406654862,
+    "pattern": "C_brief_settling_transient",
+    "context": [
+      {
+        "time_sec": 152.928,
+        "onset": 1,
+        "input_envelope": 0.06463320553302765,
+        "raw_frequency_hz": 30.690537084398976,
+        "pre_stability_frequency_hz": 34.29549558968763,
+        "tracked_frequency_hz": 34.29549558968763,
+        "reference_frequency_hz": 47.19371563408467,
+        "error_cents": 0.0,
+        "tracker_confidence": 0.5726999044418335,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 30.690537084398976,
+            "score": 0.5726999044418335
+          },
+          {
+            "frequency_hz": 35.294117647058826,
+            "score": 0.27338871359825134
+          },
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.1930086463689804
+          },
+          {
+            "frequency_hz": 76.92307692307692,
+            "score": 0.17341746389865875
+          }
+        ]
+      },
+      {
+        "time_sec": 152.93866666666668,
+        "onset": 0,
+        "input_envelope": 0.05867341160774231,
+        "raw_frequency_hz": 46.69260700389105,
+        "pre_stability_frequency_hz": 34.29549558968763,
+        "tracked_frequency_hz": 34.29549558968763,
+        "reference_frequency_hz": 47.19371563408467,
+        "error_cents": 0.0,
+        "tracker_confidence": 0.5154299139976501,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.41283082962036133
+          },
+          {
+            "frequency_hz": 31.007751937984494,
+            "score": 0.27745968103408813
+          },
+          {
+            "frequency_hz": 41.0958904109589,
+            "score": 0.23912499845027924
+          },
+          {
+            "frequency_hz": 63.492063492063494,
+            "score": 0.11840549856424332
+          }
+        ]
+      },
+      {
+        "time_sec": 152.94933333333333,
+        "onset": 0,
+        "input_envelope": 0.051653701812028885,
+        "raw_frequency_hz": 47.05882352941177,
+        "pre_stability_frequency_hz": 39.65609332437177,
+        "tracked_frequency_hz": 39.656093324371774,
+        "reference_frequency_hz": 47.19371563408467,
+        "error_cents": 0.0,
+        "tracker_confidence": 0.9751165509223938,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 47.05882352941177,
+            "score": 0.9751165509223938
+          },
+          {
+            "frequency_hz": 36.69724770642202,
+            "score": 0.13046421110630035
+          },
+          {
+            "frequency_hz": 31.413612565445025,
+            "score": 0.1263759732246399
+          },
+          {
+            "frequency_hz": 171.42857142857142,
+            "score": 0.11227475106716156
+          }
+        ]
+      },
+      {
+        "time_sec": 152.96,
+        "onset": 0,
+        "input_envelope": 0.0630335658788681,
+        "raw_frequency_hz": 47.05882352941177,
+        "pre_stability_frequency_hz": 42.76524001048857,
+        "tracked_frequency_hz": 42.76524001048857,
+        "reference_frequency_hz": 47.19371563408467,
+        "error_cents": 0.0,
+        "tracker_confidence": 0.9766634702682495,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 47.05882352941177,
+            "score": 0.9766634702682495
+          },
+          {
+            "frequency_hz": 30.848329048843187,
+            "score": 0.23007173836231232
+          },
+          {
+            "frequency_hz": 36.144578313253014,
+            "score": 0.17886720597743988
+          },
+          {
+            "frequency_hz": 31.662269129287598,
+            "score": 0.15014168620109558
+          }
+        ]
+      },
+      {
+        "time_sec": 152.97066666666666,
+        "onset": 0,
+        "input_envelope": 0.055429890751838684,
+        "raw_frequency_hz": 46.875,
+        "pre_stability_frequency_hz": 44.49133920608337,
+        "tracked_frequency_hz": 44.49133920608337,
+        "reference_frequency_hz": 47.19371563408467,
+        "error_cents": 102.08428406654862,
+        "tracker_confidence": 0.983169436454773,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.875,
+            "score": 0.983169436454773
+          },
+          {
+            "frequency_hz": 31.413612565445025,
+            "score": 0.23263750970363617
+          },
+          {
+            "frequency_hz": 36.474164133738604,
+            "score": 0.16084742546081543
+          },
+          {
+            "frequency_hz": 169.01408450704224,
+            "score": 0.12234114110469818
+          }
+        ]
+      },
+      {
+        "time_sec": 152.98133333333334,
+        "onset": 0,
+        "input_envelope": 0.06183702498674393,
+        "raw_frequency_hz": 46.875,
+        "pre_stability_frequency_hz": 45.49247673952835,
+        "tracked_frequency_hz": 45.49247673952835,
+        "reference_frequency_hz": 47.19371563408467,
+        "error_cents": 63.56013644917359,
+        "tracker_confidence": 0.9827951788902283,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.875,
+            "score": 0.9827951788902283
+          },
+          {
+            "frequency_hz": 31.662269129287598,
+            "score": 0.4524998962879181
+          },
+          {
+            "frequency_hz": 36.03603603603604,
+            "score": 0.14185354113578796
+          },
+          {
+            "frequency_hz": 164.3835616438356,
+            "score": 0.10779821127653122
+          }
+        ]
+      },
+      {
+        "time_sec": 152.992,
+        "onset": 0,
+        "input_envelope": 0.0544060580432415,
+        "raw_frequency_hz": 46.875,
+        "pre_stability_frequency_hz": 46.073136508926446,
+        "tracked_frequency_hz": 46.07313650892645,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 21.60273555253932,
+        "tracker_confidence": 0.9840328097343445,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.875,
+            "score": 0.9840328097343445
+          },
+          {
+            "frequency_hz": 36.58536585365854,
+            "score": 0.1726786345243454
+          },
+          {
+            "frequency_hz": 31.33159268929504,
+            "score": 0.16797028481960297
+          },
+          {
+            "frequency_hz": 169.01408450704224,
+            "score": 0.106963150203228
+          }
+        ]
+      },
+      {
+        "time_sec": 153.00266666666667,
+        "onset": 0,
+        "input_envelope": 0.057267021387815475,
+        "raw_frequency_hz": 46.875,
+        "pre_stability_frequency_hz": 46.409919175177336,
+        "tracked_frequency_hz": 46.409919175177336,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 8.993891869262251,
+        "tracker_confidence": 0.98551344871521,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.875,
+            "score": 0.98551344871521
+          },
+          {
+            "frequency_hz": 31.662269129287598,
+            "score": 0.5341203808784485
+          },
+          {
+            "frequency_hz": 96.0,
+            "score": 0.12287246435880661
+          },
+          {
+            "frequency_hz": 36.03603603603604,
+            "score": 0.1111530140042305
+          }
+        ]
+      },
+      {
+        "time_sec": 153.01333333333332,
+        "onset": 0,
+        "input_envelope": 0.050445202738046646,
+        "raw_frequency_hz": 46.875,
+        "pre_stability_frequency_hz": 46.60525312160286,
+        "tracked_frequency_hz": 46.60525312160285,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 1.7226205753387993,
+        "tracker_confidence": 0.9876034259796143,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.875,
+            "score": 0.9876034259796143
+          },
+          {
+            "frequency_hz": 30.690537084398976,
+            "score": 0.45835286378860474
+          },
+          {
+            "frequency_hz": 36.58536585365854,
+            "score": 0.17320284247398376
+          },
+          {
+            "frequency_hz": 91.6030534351145,
+            "score": 0.13007491827011108
+          }
+        ]
+      },
+      {
+        "time_sec": 153.024,
+        "onset": 0,
+        "input_envelope": 0.05289917811751366,
+        "raw_frequency_hz": 46.875,
+        "pre_stability_frequency_hz": 46.71854681052966,
+        "tracked_frequency_hz": 46.71854681052965,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 2.4807656629099095,
+        "tracker_confidence": 0.9871649742126465,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.875,
+            "score": 0.9871649742126465
+          },
+          {
+            "frequency_hz": 31.746031746031747,
+            "score": 0.6094889640808105
+          },
+          {
+            "frequency_hz": 96.7741935483871,
+            "score": 0.15919344127178192
+          },
+          {
+            "frequency_hz": 62.5,
+            "score": 0.09585976600646973
+          }
+        ]
+      },
+      {
+        "time_sec": 153.03466666666668,
+        "onset": 0,
+        "input_envelope": 0.046646688133478165,
+        "raw_frequency_hz": 46.69260700389105,
+        "pre_stability_frequency_hz": 46.707652091741444,
+        "tracked_frequency_hz": 46.707652091741444,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 2.076996518317332,
+        "tracker_confidence": 0.990304708480835,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.990304708480835
+          },
+          {
+            "frequency_hz": 30.612244897959183,
+            "score": 0.5202261209487915
+          },
+          {
+            "frequency_hz": 36.69724770642202,
+            "score": 0.19621221721172333
+          },
+          {
+            "frequency_hz": 90.9090909090909,
+            "score": 0.1721610426902771
+          }
+        ]
+      },
+      {
+        "time_sec": 153.04533333333333,
+        "onset": 0,
+        "input_envelope": 0.04815363511443138,
+        "raw_frequency_hz": 46.69260700389105,
+        "pre_stability_frequency_hz": 46.70133315484428,
+        "tracked_frequency_hz": 46.70133315484428,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 1.8427672587212018,
+        "tracker_confidence": 0.9906444549560547,
+        "family_promoted": 0,
+        "stability_mode": "moving",
+        "candidates": [
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.9906444549560547
+          },
+          {
+            "frequency_hz": 31.746031746031747,
+            "score": 0.6120344996452332
+          },
+          {
+            "frequency_hz": 96.7741935483871,
+            "score": 0.19995354115962982
+          },
+          {
+            "frequency_hz": 62.17616580310881,
+            "score": 0.09755123406648636
+          }
+        ]
+      },
+      {
+        "time_sec": 153.056,
+        "onset": 0,
+        "input_envelope": 0.04259653389453888,
+        "raw_frequency_hz": 46.69260700389105,
+        "pre_stability_frequency_hz": 46.69766817144392,
+        "tracked_frequency_hz": 46.69968387672006,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 1.7816268871050567,
+        "tracker_confidence": 0.9928325414657593,
+        "family_promoted": 0,
+        "stability_mode": "stable",
+        "candidates": [
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.9928325414657593
+          },
+          {
+            "frequency_hz": 30.53435114503817,
+            "score": 0.5884584188461304
+          },
+          {
+            "frequency_hz": 90.22556390977444,
+            "score": 0.20550303161144257
+          },
+          {
+            "frequency_hz": 36.809815950920246,
+            "score": 0.19395458698272705
+          }
+        ]
+      },
+      {
+        "time_sec": 153.06666666666666,
+        "onset": 0,
+        "input_envelope": 0.0453752838075161,
+        "raw_frequency_hz": 46.69260700389105,
+        "pre_stability_frequency_hz": 46.69554248107171,
+        "tracked_frequency_hz": 46.69782020322718,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 1.7125360684707205,
+        "tracker_confidence": 0.9931108355522156,
+        "family_promoted": 0,
+        "stability_mode": "stable",
+        "candidates": [
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.9931108355522156
+          },
+          {
+            "frequency_hz": 31.83023872679045,
+            "score": 0.6288285255432129
+          },
+          {
+            "frequency_hz": 96.7741935483871,
+            "score": 0.22316551208496094
+          },
+          {
+            "frequency_hz": 61.855670103092784,
+            "score": 0.10671055316925049
+          }
+        ]
+      },
+      {
+        "time_sec": 153.07733333333334,
+        "onset": 0,
+        "input_envelope": 0.040208082646131516,
+        "raw_frequency_hz": 46.69260700389105,
+        "pre_stability_frequency_hz": 46.69430958065583,
+        "tracked_frequency_hz": 46.696240390408754,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 1.653966482240235,
+        "tracker_confidence": 0.9945770502090454,
+        "family_promoted": 0,
+        "stability_mode": "stable",
+        "candidates": [
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.9945770502090454
+          },
+          {
+            "frequency_hz": 30.379746835443036,
+            "score": 0.6167446374893188
+          },
+          {
+            "frequency_hz": 90.22556390977444,
+            "score": 0.22779512405395508
+          },
+          {
+            "frequency_hz": 36.809815950920246,
+            "score": 0.21253778040409088
+          }
+        ]
+      },
+      {
+        "time_sec": 153.088,
+        "onset": 0,
+        "input_envelope": 0.04305771365761757,
+        "raw_frequency_hz": 46.69260700389105,
+        "pre_stability_frequency_hz": 46.693594498414626,
+        "tracked_frequency_hz": 46.69504972045814,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 1.609822572088275,
+        "tracker_confidence": 0.9947634935379028,
+        "family_promoted": 0,
+        "stability_mode": "stable",
+        "candidates": [
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.9947634935379028
+          },
+          {
+            "frequency_hz": 31.83023872679045,
+            "score": 0.6622875332832336
+          },
+          {
+            "frequency_hz": 97.5609756097561,
+            "score": 0.2507288157939911
+          },
+          {
+            "frequency_hz": 61.224489795918366,
+            "score": 0.11713562160730362
+          }
+        ]
+      },
+      {
+        "time_sec": 153.09866666666667,
+        "onset": 0,
+        "input_envelope": 0.038257576525211334,
+        "raw_frequency_hz": 46.69260700389105,
+        "pre_stability_frequency_hz": 46.69317975071473,
+        "tracked_frequency_hz": 46.69420822480632,
+        "reference_frequency_hz": 46.65164957684037,
+        "error_cents": 1.5786235679058966,
+        "tracker_confidence": 0.9950379729270935,
+        "family_promoted": 0,
+        "stability_mode": "stable",
+        "candidates": [
+          {
+            "frequency_hz": 46.69260700389105,
+            "score": 0.9950379729270935
+          },
+          {
+            "frequency_hz": 30.303030303030305,
+            "score": 0.6508597731590271
+          },
+          {
+            "frequency_hz": 90.22556390977444,
+            "score": 0.2619619369506836
+          },
+          {
+            "frequency_hz": 36.92307692307692,
+            "score": 0.21056748926639557
+          }
+        ]
+      }
+    ]
+  }
+]

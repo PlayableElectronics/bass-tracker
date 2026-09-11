@@ -1,0 +1,11 @@
+{
+  "baseline": false,
+  "name": "attack_pitch_B",
+  "description": "Latch the first plausible tracked pitch at onset and hold it through a contradictory octave candidate and tracker recovery.",
+  "anchor": "first",
+  "require_connected": false,
+  "maximum_hold_frames": 12,
+  "support_ratio": 0.98,
+  "winner_ratio": 1.08,
+  "kind": "hold"
+}
