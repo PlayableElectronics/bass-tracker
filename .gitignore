@@ -1,2 +1,4 @@
+.venv-tracker-lab/
+tracker_runs/
 build/
 __pycache__/
