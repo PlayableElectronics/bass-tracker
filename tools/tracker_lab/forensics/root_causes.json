@@ -1,0 +1,63 @@
+{
+  "event_primary_counts": {
+    "A_detector_top_candidate_wrong": 6,
+    "B_family_selector_changes_correct_top": 1,
+    "C_promotion_confirmation_delays_correct_family": 0,
+    "D_pre_stability_slew_lag": 22,
+    "E_adaptive_stability_lag": 0,
+    "F_previous_state_hold": 2,
+    "G_reference_uncertain": 0,
+    "H_other_state_interaction": 0
+  },
+  "error_frame_primary_counts": {
+    "A_detector_top_candidate_wrong": 8,
+    "B_family_selector_changes_correct_top": 4,
+    "C_promotion_confirmation_delays_correct_family": 0,
+    "D_pre_stability_slew_lag": 52,
+    "E_adaptive_stability_lag": 0,
+    "F_previous_state_hold": 3,
+    "G_reference_uncertain": 0,
+    "H_other_state_interaction": 0
+  },
+  "error_frame_group_counts": {
+    "target_selection_error": 12,
+    "slew_or_state_lag": 55,
+    "stability_lag": 0
+  },
+  "candidate_evidence_error_frames": {
+    "total": 67,
+    "correct_candidate_present": 63,
+    "correct_candidate_rank_counts": {
+      "0": 4,
+      "1": 57,
+      "2": 3,
+      "3": 3,
+      "4": 0
+    },
+    "top_raw_within_100_cents": 57,
+    "selected_target_within_100_cents": 53,
+    "pre_stability_within_100_cents": 0
+  },
+  "ranking": [
+    {
+      "stage": "D_pre_stability_slew_lag",
+      "event_count": 22,
+      "error_frame_count": 52
+    },
+    {
+      "stage": "A_detector_top_candidate_wrong",
+      "event_count": 6,
+      "error_frame_count": 8
+    },
+    {
+      "stage": "F_previous_state_hold",
+      "event_count": 2,
+      "error_frame_count": 3
+    },
+    {
+      "stage": "B_family_selector_changes_correct_top",
+      "event_count": 1,
+      "error_frame_count": 4
+    }
+  ]
+}
