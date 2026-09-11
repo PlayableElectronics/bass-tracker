@@ -1,0 +1,329 @@
+{
+  "fixed_gain": {
+    "definition": {
+      "audible": "synth_gain >= 0.10",
+      "weighted_duration": "sum(synth_gain) * 10.667 ms per selected frame",
+      "tail": "source envelope is falling and <=45% of its preceding 480 ms peak",
+      "large_error": "classification is large_pitch_error or absolute reference error >=100 cents"
+    },
+    "source_duration_sec": 581.504,
+    "audible_duration_sec": 420.81066666666675,
+    "audible_binary_duration_sec": 420.81066666666675,
+    "attack": {
+      "eligible_onsets": 233,
+      "gain_ge_0.5": {
+        "count": 233,
+        "median_sec": 0.0,
+        "p90_sec": 0.0
+      },
+      "gain_ge_0.9": {
+        "count": 233,
+        "median_sec": 0.0,
+        "p90_sec": 0.0
+      }
+    },
+    "slide_regions": {
+      "slide_160s": {
+        "duration_sec": 0.5546666666666668,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      },
+      "slide_163s": {
+        "duration_sec": 0.6506666666666667,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      },
+      "slide_170s": {
+        "duration_sec": 0.5973333333333334,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      },
+      "slide_376s": {
+        "duration_sec": 0.7466666666666668,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      }
+    },
+    "decay_regions": {
+      "decay_130s": {
+        "duration_sec": 0.8960000000000001,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      },
+      "decay_250s": {
+        "duration_sec": 1.2053333333333336,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      },
+      "decay_432s": {
+        "duration_sec": 0.544,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      }
+    },
+    "worst_audible_tail_events": [
+      {
+        "start_sec": 432.7146666666667,
+        "end_sec": 432.78933333333333,
+        "duration_sec": 0.08533333333333334,
+        "gain_seconds": 0.08533333333333334,
+        "max_gain": 1.0
+      },
+      {
+        "start_sec": 187.54133333333334,
+        "end_sec": 187.57333333333332,
+        "duration_sec": 0.04266666666666667,
+        "gain_seconds": 0.04266666666666667,
+        "max_gain": 1.0
+      },
+      {
+        "start_sec": 169.44,
+        "end_sec": 169.46133333333333,
+        "duration_sec": 0.032,
+        "gain_seconds": 0.032,
+        "max_gain": 1.0
+      },
+      {
+        "start_sec": 91.73333333333333,
+        "end_sec": 91.744,
+        "duration_sec": 0.021333333333333336,
+        "gain_seconds": 0.021333333333333336,
+        "max_gain": 1.0
+      },
+      {
+        "start_sec": 177.33333333333334,
+        "end_sec": 177.33333333333334,
+        "duration_sec": 0.010666666666666668,
+        "gain_seconds": 0.010666666666666668,
+        "max_gain": 1.0
+      },
+      {
+        "start_sec": 184.01066666666668,
+        "end_sec": 184.01066666666668,
+        "duration_sec": 0.010666666666666668,
+        "gain_seconds": 0.010666666666666668,
+        "max_gain": 1.0
+      },
+      {
+        "start_sec": 228.87466666666666,
+        "end_sec": 228.87466666666666,
+        "duration_sec": 0.010666666666666668,
+        "gain_seconds": 0.010666666666666668,
+        "max_gain": 1.0
+      }
+    ],
+    "errors": {
+      "octave_error": {
+        "raw_duration_sec": 2.4960000000000004,
+        "audible_duration_sec": 2.4960000000000004,
+        "weighted_duration_sec": 2.4960000000000004
+      },
+      "large_error": {
+        "raw_duration_sec": 5.376,
+        "audible_duration_sec": 5.376,
+        "weighted_duration_sec": 5.376
+      },
+      "false_positive": {
+        "raw_duration_sec": 289.58933333333334,
+        "audible_duration_sec": 289.58933333333334,
+        "weighted_duration_sec": 289.58933333333334
+      },
+      "tail_error": {
+        "raw_duration_sec": 0.21333333333333337,
+        "audible_duration_sec": 0.21333333333333337,
+        "weighted_duration_sec": 0.21333333333333337
+      },
+      "tail_large_error": {
+        "raw_duration_sec": 0.21333333333333337,
+        "audible_duration_sec": 0.21333333333333337,
+        "weighted_duration_sec": 0.21333333333333337
+      },
+      "tail_octave_error": {
+        "raw_duration_sec": 0.0,
+        "audible_duration_sec": 0.0,
+        "weighted_duration_sec": 0.0
+      }
+    },
+    "clean_note_gain": {
+      "correct_reference_weighted_duration_sec": 123.95733333333335,
+      "correct_reference_median_gain": 1.0,
+      "strong_clean_definition": "reference voiced, <25-cent error, input envelope >= 0.012",
+      "strong_clean_duration_sec": 64.71466666666667,
+      "strong_clean_median_gain": 1.0,
+      "strong_clean_gain_below_0_9_sec": 0.0
+    },
+    "tail_error_energy_cent_seconds": 214.99697419613886,
+    "large_error_energy_cent_seconds": 4210.2800818618025
+  },
+  "selected": "envelope_02",
+  "selected_metrics": {
+    "definition": {
+      "audible": "synth_gain >= 0.10",
+      "weighted_duration": "sum(synth_gain) * 10.667 ms per selected frame",
+      "tail": "source envelope is falling and <=45% of its preceding 480 ms peak",
+      "large_error": "classification is large_pitch_error or absolute reference error >=100 cents"
+    },
+    "source_duration_sec": 581.504,
+    "audible_duration_sec": 364.1403519077177,
+    "audible_binary_duration_sec": 405.35466666666673,
+    "attack": {
+      "eligible_onsets": 233,
+      "gain_ge_0.5": {
+        "count": 233,
+        "median_sec": 0.0,
+        "p90_sec": 0.0
+      },
+      "gain_ge_0.9": {
+        "count": 233,
+        "median_sec": 0.0,
+        "p90_sec": 0.0
+      }
+    },
+    "slide_regions": {
+      "slide_160s": {
+        "duration_sec": 0.5546666666666668,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      },
+      "slide_163s": {
+        "duration_sec": 0.6506666666666667,
+        "gain_median": 1.0,
+        "gain_min": 0.7028856566823105,
+        "gain_below_0_5_sec": 0.0
+      },
+      "slide_170s": {
+        "duration_sec": 0.5973333333333334,
+        "gain_median": 1.0,
+        "gain_min": 0.7455423389409099,
+        "gain_below_0_5_sec": 0.0
+      },
+      "slide_376s": {
+        "duration_sec": 0.7466666666666668,
+        "gain_median": 0.9999999999883176,
+        "gain_min": 0.9141927558590546,
+        "gain_below_0_5_sec": 0.0
+      }
+    },
+    "decay_regions": {
+      "decay_130s": {
+        "duration_sec": 0.8960000000000001,
+        "gain_median": 1.0,
+        "gain_min": 1.0,
+        "gain_below_0_5_sec": 0.0
+      },
+      "decay_250s": {
+        "duration_sec": 1.2053333333333336,
+        "gain_median": 0.9825228988896659,
+        "gain_min": 0.1955469620927661,
+        "gain_below_0_5_sec": 0.11733333333333335
+      },
+      "decay_432s": {
+        "duration_sec": 0.544,
+        "gain_median": 0.21577326067450397,
+        "gain_min": 0.023382921723438827,
+        "gain_below_0_5_sec": 0.3733333333333334
+      }
+    },
+    "worst_audible_tail_events": [
+      {
+        "start_sec": 169.44,
+        "end_sec": 169.46133333333333,
+        "duration_sec": 0.032,
+        "gain_seconds": 0.032,
+        "max_gain": 1.0
+      },
+      {
+        "start_sec": 91.73333333333333,
+        "end_sec": 91.744,
+        "duration_sec": 0.021333333333333336,
+        "gain_seconds": 0.02079030383414188,
+        "max_gain": 0.9790746218210695
+      },
+      {
+        "start_sec": 432.7146666666667,
+        "end_sec": 432.78933333333333,
+        "duration_sec": 0.08533333333333334,
+        "gain_seconds": 0.015051361791989707,
+        "max_gain": 0.23583137245412777
+      },
+      {
+        "start_sec": 184.01066666666668,
+        "end_sec": 184.01066666666668,
+        "duration_sec": 0.010666666666666668,
+        "gain_seconds": 0.010666666666666668,
+        "max_gain": 1.0
+      },
+      {
+        "start_sec": 177.33333333333334,
+        "end_sec": 177.33333333333334,
+        "duration_sec": 0.010666666666666668,
+        "gain_seconds": 0.010217007057007734,
+        "max_gain": 0.9578444115944749
+      },
+      {
+        "start_sec": 228.87466666666666,
+        "end_sec": 228.87466666666666,
+        "duration_sec": 0.010666666666666668,
+        "gain_seconds": 0.007198096729619828,
+        "max_gain": 0.6748215684018588
+      },
+      {
+        "start_sec": 187.54133333333334,
+        "end_sec": 187.57333333333332,
+        "duration_sec": 0.04266666666666667,
+        "gain_seconds": 0.0033959598003354885,
+        "max_gain": 0.09049768886596798
+      }
+    ],
+    "errors": {
+      "octave_error": {
+        "raw_duration_sec": 2.4960000000000004,
+        "audible_duration_sec": 2.4960000000000004,
+        "weighted_duration_sec": 1.6495334517513298
+      },
+      "large_error": {
+        "raw_duration_sec": 5.376,
+        "audible_duration_sec": 5.333333333333334,
+        "weighted_duration_sec": 3.832498377087257
+      },
+      "false_positive": {
+        "raw_duration_sec": 289.58933333333334,
+        "audible_duration_sec": 274.4746666666667,
+        "weighted_duration_sec": 249.31309047342165
+      },
+      "tail_error": {
+        "raw_duration_sec": 0.21333333333333337,
+        "audible_duration_sec": 0.1706666666666667,
+        "weighted_duration_sec": 0.0993193958797613
+      },
+      "tail_large_error": {
+        "raw_duration_sec": 0.21333333333333337,
+        "audible_duration_sec": 0.1706666666666667,
+        "weighted_duration_sec": 0.0993193958797613
+      },
+      "tail_octave_error": {
+        "raw_duration_sec": 0.0,
+        "audible_duration_sec": 0.0,
+        "weighted_duration_sec": 0.0
+      }
+    },
+    "clean_note_gain": {
+      "correct_reference_weighted_duration_sec": 109.31718283176289,
+      "correct_reference_median_gain": 0.9999999992910223,
+      "strong_clean_definition": "reference voiced, <25-cent error, input envelope >= 0.012",
+      "strong_clean_duration_sec": 64.71466666666667,
+      "strong_clean_median_gain": 1.0,
+      "strong_clean_gain_below_0_9_sec": 0.0
+    },
+    "tail_error_energy_cent_seconds": 120.92693052883398,
+    "large_error_energy_cent_seconds": 2814.322407638765
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "fixed_gain": false,
+  "name": "envelope_02",
+  "description": "More conservative tail cutoff; same source-driven causal release.",
+  "audible_on": 0.002,
+  "audible_off": 0.0012,
+  "nominal_level": 0.012,
+  "attack_ms": 4.0,
+  "release_ms": 120.0,
+  "require_pitch_valid": true,
+  "confidence_tail_floor": 0.0
+}
