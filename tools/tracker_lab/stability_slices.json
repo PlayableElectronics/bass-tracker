@@ -1,0 +1,24 @@
+{
+  "description": "Fixed Mac-lab regression slices. Development slices were used to choose the small stability-filter search; hold-out slices were read only after selection.",
+  "development": [
+    {"name": "stable_low_46", "start_sec": 67.253, "end_sec": 68.992, "kind": "stable_sustain", "reference_hz": 46.12},
+    {"name": "stable_low_55", "start_sec": 261.504, "end_sec": 264.267, "kind": "stable_sustain", "reference_hz": 55.48},
+    {"name": "stable_mid_92", "start_sec": 102.933, "end_sec": 104.853, "kind": "stable_sustain", "reference_hz": 92.23},
+    {"name": "octave_74", "start_sec": 70.0, "end_sec": 80.0, "kind": "octave_family_regression"},
+    {"name": "octave_88", "start_sec": 84.0, "end_sec": 94.0, "kind": "octave_family_regression"},
+    {"name": "octave_295", "start_sec": 290.0, "end_sec": 302.0, "kind": "octave_family_regression"},
+    {"name": "attack_74", "start_sec": 73.90, "end_sec": 74.60, "kind": "attack_transition"},
+    {"name": "slide_160", "start_sec": 159.70, "end_sec": 160.25, "kind": "slide"},
+    {"name": "slide_170", "start_sec": 170.15, "end_sec": 170.75, "kind": "slide"},
+    {"name": "decay_250", "start_sec": 249.835, "end_sec": 250.656, "kind": "decay"}
+  ],
+  "holdout": [
+    {"name": "stable_low_46_holdout", "start_sec": 113.920, "end_sec": 115.701, "kind": "stable_sustain", "reference_hz": 46.12},
+    {"name": "stable_low_49_holdout", "start_sec": 266.197, "end_sec": 268.075, "kind": "stable_sustain", "reference_hz": 49.43},
+    {"name": "stable_mid_92_holdout", "start_sec": 88.981, "end_sec": 90.624, "kind": "stable_sustain", "reference_hz": 92.23},
+    {"name": "attack_88_holdout", "start_sec": 87.90, "end_sec": 88.70, "kind": "attack_transition"},
+    {"name": "slide_163_holdout", "start_sec": 162.75, "end_sec": 163.40, "kind": "slide"},
+    {"name": "slide_376_holdout", "start_sec": 375.50, "end_sec": 376.25, "kind": "slide"},
+    {"name": "decay_130_holdout", "start_sec": 129.717, "end_sec": 130.251, "kind": "decay"}
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "experiment": "adaptive_onepole",
+  "hypothesis": "A log-frequency one-pole is active only for nearby non-trending motion; attacks, confirmed family promotion, >=8-cent trends, and >=140-cent steps bypass it at full speed.",
+  "input_frames": "tools/tracker_lab/experiments/octave_v1/frames.csv.gz",
+  "stability_config": {
+    "method": "adaptive_onepole",
+    "median_window": 3,
+    "stable_alpha": 0.45,
+    "moving_alpha": 1.0,
+    "motion_cents": 8.0,
+    "bypass_cents": 140.0,
+    "stable_reference_delta_cents": 10.0,
+    "micro_jump_cents": 35.0,
+    "return_cents": 18.0,
+    "return_frames": 4,
+    "persistence_cents": 28.0,
+    "persistence_match_cents": 18.0
+  }
+}
