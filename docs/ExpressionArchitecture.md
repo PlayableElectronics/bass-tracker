@@ -72,16 +72,36 @@ spectral distribution, instability interaction, mode coupling, stochastic
 excitation, resonator damping, and structural morph. No conventional synth,
 FM voice, compressor, or pitch quantizer is implemented here.
 
+Smoothing is applied to each route before route contributions are summed. Each
+route therefore has one fixed state value; a slow ambiguity route cannot delay
+an otherwise immediate attack route targeting the same destination. Replacing a
+route resets its state, and disabling a route clears its state deterministically.
+
 At the current 93.75 Hz analysis rate, the new analysis is fixed-size and uses
 no allocation, locks, filesystem, FFT, or future samples. The matrix is also
-fixed-size; it costs at most 16 routes × 7 destinations of scalar work per
-analysis frame, with no routes enabled in the firmware milestone.
+fixed-size and costs at most 16 routes of scalar work per analysis frame, with
+no routes enabled in the firmware milestone.
 
 ## USB / UI boundary
 
 The normal build keeps USB CDC CSV diagnostics, including a compact `expr`
 line about 11.7 times per second. The optional USB-MIDI build exposes the
 calibration protocol and expression telemetry to `tools/expression_web/`.
+
+State, progress, and normalized meters use ordinary 7-bit CC. Raw values and
+learned/manual ranges use 14-bit CC pairs. A pair is sent MSB first, followed
+by LSB, and decoded as `(MSB << 7) | LSB` in `0..16383`. Unipolar values map
+`0..1` to `0..16383`; bipolar live values map `-1..+1` to the same range, so
+zero is centered. Normalized and pitch-motion raw telemetry both use bipolar
+encoding. Calibration stores bipolar features as absolute magnitudes, so their
+learned/active ranges are unipolar magnitude ranges.
+
+Range pairs are amplitude low/high MSB `14/15` with LSB `61/62`, and selected
+feature low/high MSB `16/17` with LSB `63/64`. Manual range controls use low
+MSB/LSB `23/26` and high MSB/LSB `24/27`. Raw feature telemetry uses MSB
+controllers `70..80` and matching LSB controllers `81..91`. Normalized feature
+telemetry remains `30..40` as ordinary 7-bit CC.
+
 Because the installed libDaisy USB backend is non-composite, these are explicit
 alternative build modes rather than two competing USB initializations.
 

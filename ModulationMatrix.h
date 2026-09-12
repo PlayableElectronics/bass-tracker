@@ -51,6 +51,6 @@ class ModulationMatrix
 
   private:
     ModulationRoute routes_[kMaxModulationRoutes] = {};
-    float smoothed_[kModulationDestinationCount] = {};
+    float smoothed_routes_[kMaxModulationRoutes] = {};
 };
 } // namespace bass

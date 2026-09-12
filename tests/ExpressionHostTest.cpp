@@ -16,6 +16,30 @@ bool Near(float a, float b, float tolerance = 0.08f)
     return std::fabs(a - b) <= tolerance;
 }
 
+void TestMidiRoundTrips()
+{
+    const float unipolar_values[] = {0.0f, 0.0012f, 0.0020f, 0.018f, 0.5f, 1.0f};
+    for(float value : unipolar_values)
+    {
+        const uint16_t encoded = bass::ExpressionMidiProtocol::EncodeUnipolar14(value);
+        assert(Near(bass::ExpressionMidiProtocol::DecodeUnipolar14(encoded), value, 0.0001f));
+    }
+    const float bipolar_values[] = {-1.0f, -0.5f, 0.0f, 0.5f, 1.0f};
+    for(float value : bipolar_values)
+    {
+        const uint16_t encoded = bass::ExpressionMidiProtocol::EncodeBipolar14(value);
+        assert(Near(bass::ExpressionMidiProtocol::DecodeBipolar14(encoded), value, 0.0001f));
+    }
+    const float motion_values[] = {-300.0f, -25.0f, 0.0f, 25.0f, 300.0f};
+    for(float value : motion_values)
+    {
+        const uint16_t encoded = bass::ExpressionMidiProtocol::EncodeRaw14(
+            bass::ExpressionFeature::PitchMotion, value);
+        assert(Near(bass::ExpressionMidiProtocol::DecodeRaw14(
+                        bass::ExpressionFeature::PitchMotion, encoded), value, 0.1f));
+    }
+}
+
 bass::ExpressionValues Raw(float gain, float shape)
 {
     bass::ExpressionValues values = {};
@@ -55,6 +79,7 @@ void Learn(bass::ExpressionCalibration& calibration, float gain)
 
 int main()
 {
+    TestMidiRoundTrips();
     // Expression analysis keeps uncertain candidate-family information instead
     // of dropping it after stable pitch selection.
     bass::ExpressionAnalyzer analyzer;
@@ -122,16 +147,38 @@ int main()
     assert(midi_calibration.Status().state == bass::CalibrationState::Calibrating);
     assert(midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlFeature, 0,
                                     midi_calibration));
-    assert(midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlManualLow, 16,
-                                    midi_calibration));
-    assert(midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlManualHigh, 96,
-                                    midi_calibration));
+    const uint16_t amplitude_low = bass::ExpressionMidiProtocol::EncodeRaw14(
+        bass::ExpressionFeature::Amplitude, 0.0012f);
+    const uint16_t amplitude_high = bass::ExpressionMidiProtocol::EncodeRaw14(
+        bass::ExpressionFeature::Amplitude, 0.018f);
+    assert(midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlManualLowMsb,
+                                    amplitude_low >> 7, midi_calibration));
+    assert(midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlManualLowLsb,
+                                    amplitude_low & 0x7f, midi_calibration));
+    assert(midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlManualHighMsb,
+                                    amplitude_high >> 7, midi_calibration));
+    assert(midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlManualHighLsb,
+                                    amplitude_high & 0x7f, midi_calibration));
     assert(midi_calibration.Status().features[0].mode == bass::CalibrationRangeMode::Manual);
+    assert(Near(midi_calibration.Status().features[0].active_low, 0.0012f, 0.0001f));
+    assert(Near(midi_calibration.Status().features[0].active_high, 0.018f, 0.0001f));
     assert(midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlCommand, 2,
                                     midi_calibration));
     assert(midi_calibration.Status().state == bass::CalibrationState::Frozen);
-    uint8_t telemetry[96] = {};
-    assert(midi.BuildTelemetry(frame, midi_calibration.Status(), telemetry, sizeof(telemetry)) > 0);
+    uint8_t telemetry[192] = {};
+    const size_t telemetry_size = midi.BuildTelemetry(frame, midi_calibration.Status(),
+                                                       telemetry, sizeof(telemetry));
+    assert(telemetry_size >= 129);
+    const size_t pitch_motion_norm_value = 30 + 9 * 9 + 2;
+    frame.normalized.values[static_cast<size_t>(bass::ExpressionFeature::PitchMotion)] = -1.0f;
+    midi.BuildTelemetry(frame, midi_calibration.Status(), telemetry, sizeof(telemetry));
+    assert(telemetry[pitch_motion_norm_value] == 0);
+    frame.normalized.values[static_cast<size_t>(bass::ExpressionFeature::PitchMotion)] = 0.0f;
+    midi.BuildTelemetry(frame, midi_calibration.Status(), telemetry, sizeof(telemetry));
+    assert(telemetry[pitch_motion_norm_value] == 64);
+    frame.normalized.values[static_cast<size_t>(bass::ExpressionFeature::PitchMotion)] = 1.0f;
+    midi.BuildTelemetry(frame, midi_calibration.Status(), telemetry, sizeof(telemetry));
+    assert(telemetry[pitch_motion_norm_value] == 127);
 
     bass::ModulationMatrix matrix;
     matrix.Init();
@@ -141,9 +188,27 @@ int main()
     route.amount = 0.8f;
     route.enabled = true;
     assert(matrix.SetRoute(0, route));
+    bass::ModulationRoute slow = route;
+    slow.source = bass::ExpressionFeature::PitchInstability;
+    slow.amount = 0.8f;
+    slow.smoothing_seconds = 1.0f;
+    assert(matrix.SetRoute(1, slow));
     frame.normalized = unity.Normalize(frame.raw);
     bass::ModulationFrame modulation = matrix.Process(frame, kFrameSeconds);
     assert(modulation.values[static_cast<size_t>(bass::ModulationDestination::ModeCoupling)] >= 0.0f);
+    frame.normalized.values[static_cast<size_t>(bass::ExpressionFeature::OctaveTension)] = 1.0f;
+    frame.normalized.values[static_cast<size_t>(bass::ExpressionFeature::PitchInstability)] = 1.0f;
+    const float first = matrix.Process(frame, kFrameSeconds).values[
+        static_cast<size_t>(bass::ModulationDestination::ModeCoupling)];
+    assert(first > 0.7f);
+    assert(first < 1.0f);
+    assert(matrix.SetRoute(1, bass::ModulationRoute{}));
+    const float after_replace = matrix.Process(frame, kFrameSeconds).values[
+        static_cast<size_t>(bass::ModulationDestination::ModeCoupling)];
+    assert(after_replace > 0.7f);
+    assert(matrix.SetRoute(0, bass::ModulationRoute{}));
+    assert(matrix.Process(frame, kFrameSeconds).values[
+               static_cast<size_t>(bass::ModulationDestination::ModeCoupling)] == 0.0f);
     assert(!matrix.SetRoute(bass::kMaxModulationRoutes, route));
     return 0;
 }

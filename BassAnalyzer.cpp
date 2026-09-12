@@ -210,7 +210,8 @@ void EmitExpressionMidi(const bass::BassAnalysis& analysis)
 {
     if(analysis.sequence % kExpressionMidiDivider != 0)
         return;
-    uint8_t bytes[96] = {};
+    // 7-bit state/progress plus 14-bit ranges and raw feature pairs.
+    uint8_t bytes[192] = {};
     const size_t size = expression_midi_protocol.BuildTelemetry(
         analysis.expression, expression_calibration.Status(), bytes, sizeof(bytes));
     if(size > 0)

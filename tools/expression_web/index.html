@@ -43,12 +43,12 @@
   <label>Feature <select id="feature"></select></label>
   <label>Mode <select id="mode"><option value="0">AUTO</option><option value="1">MANUAL</option><option value="2">LOCKED</option></select></label>
   <button id="set-mode">Set mode</button>
-  <label>Manual low (raw)<input id="manual-low" type="number" min="0" step="any" value="0"></label>
-  <label>Manual high (raw)<input id="manual-high" type="number" min="0" step="any" value="1"></label>
+  <label>Manual low (raw)<input id="manual-low" type="number" min="0" step="0.0001" value="0"></label>
+  <label>Manual high (raw)<input id="manual-high" type="number" min="0" step="0.0001" value="1"></label>
   <button id="set-range">Set manual range</button>
 </section>
 <p>Selected learned range: <strong id="selected-range">—</strong></p>
-<p class="muted">Manual ranges are feature-domain values, not audio gain. AUTO restores the frozen learned range; LOCKED snapshots the current active range. Reloading the page does not alter the device.</p>
+<p class="muted">Manual ranges are feature-domain values, not audio gain. AUTO restores the frozen learned range; LOCKED snapshots the current active range. For pitch motion, the learned/active range is a magnitude range (for example 12.3 … 184.0 cents), while live raw motion remains signed. Reloading the page does not alter the device.</p>
 
 <script>
 const channel = 15, status = 0xB0 | channel;
@@ -57,6 +57,7 @@ const domains = [1,1,1,1,1,1,1,1,1,600,600];
 const bipolar = new Set([9]);
 let midi = null, input = null, output = null;
 const raw = Array(names.length).fill(0), norm = Array(names.length).fill(0);
+const received14 = new Map();
 const stateNames = ['UNCALIBRATED','CALIBRATING','FROZEN'];
 const body = document.querySelector('#features');
 body.innerHTML = names.map((name, i) => `<tr><td>${name}</td><td id="raw-${i}">0</td><td id="norm-${i}">0</td><td><div class="meter ${bipolar.has(i)?'bipolar':''}"><i id="meter-${i}"></i></div></td></tr>`).join('');
@@ -65,6 +66,20 @@ feature.innerHTML = names.map((name,i) => `<option value="${i}">${name}</option>
 
 function midiValue(v) { return Math.max(0, Math.min(127, Math.round(v))); }
 function sendCC(controller, value) { if (output) output.send([status, controller, midiValue(value)]); }
+function encode14(value) { return Math.max(0, Math.min(16383, Math.round(value))); }
+function sendCC14(msb, lsb, value) {
+  const encoded = encode14(value);
+  if (output) { output.send([status, msb, encoded >> 7]); output.send([status, lsb, encoded & 0x7f]); }
+}
+function decode14(value) { return Math.max(0, Math.min(16383, value)) / 16383; }
+function decodeSigned14(value) { return decode14(value) * 2 - 1; }
+function receive14(msb, lsb, value) {
+  const current = received14.get(msb) || 0;
+  if (value.controller === msb) received14.set(msb, (value.value << 7) | (current & 0x7f));
+  else if (value.controller === lsb) received14.set(msb, (current & 0x3f80) | value.value);
+  else return null;
+  return received14.get(msb);
+}
 function refreshFeature() { const i = +feature.value; document.querySelector('#manual-low').max = domains[i]; document.querySelector('#manual-high').max = domains[i]; }
 function render() {
   names.forEach((_, i) => {
@@ -78,20 +93,34 @@ function render() {
 function handleMidi(event) {
   const [s, cc, value] = event.data;
   if (s !== status || value === undefined) return;
+  const pairBases = new Map();
+  for (let i=0; i<4; ++i) pairBases.set([14,15,16,17][i], [61,62,63,64][i]);
+  for (let i=0; i<names.length; ++i) pairBases.set(70+i, 81+i);
+  for (const [msb, lsb] of pairBases) {
+    if (cc === msb || cc === lsb) {
+      const encoded = receive14(msb, lsb, {controller:cc, value});
+      if (encoded === null) return;
+      if (msb === 14 || msb === 15) {
+        const old = document.querySelector('#amplitude-range').textContent.split(' – ');
+        const low = msb === 14 ? decode14(encoded) : +(old[0] || 0);
+        const high = msb === 15 ? decode14(encoded) : +(old[1] || 1);
+        document.querySelector('#amplitude-range').textContent = `${low.toFixed(6)} – ${high.toFixed(6)}`;
+      } else if (msb === 16 || msb === 17) {
+        const old = document.querySelector('#selected-range').textContent.split(' – '), max = domains[+feature.value];
+        const low = msb === 16 ? decode14(encoded)*max : +(old[0] || 0);
+        const high = msb === 17 ? decode14(encoded)*max : +(old[1] || max);
+        document.querySelector('#selected-range').textContent = `${low.toFixed(6)} – ${high.toFixed(6)}`;
+      } else {
+        const i = msb - 70;
+        raw[i] = (bipolar.has(i) ? decodeSigned14(encoded) : decode14(encoded)) * domains[i];
+        render();
+      }
+      return;
+    }
+  }
   if (cc === 12) document.querySelector('#state').textContent = stateNames[value] || 'UNKNOWN';
   else if (cc === 13) document.querySelector('#progress').textContent = `${Math.round(value / 127 * 100)}%`;
-  else if (cc === 14 || cc === 15) {
-    const old = document.querySelector('#amplitude-range').textContent.split(' – ');
-    const low = cc === 14 ? value/127 : +(old[0] || 0);
-    const high = cc === 15 ? value/127 : +(old[1] || 1);
-    document.querySelector('#amplitude-range').textContent = `${low.toFixed(4)} – ${high.toFixed(4)}`;
-  } else if (cc === 16 || cc === 17) {
-    const old = document.querySelector('#selected-range').textContent.split(' – '), max = domains[+feature.value];
-    const low = cc === 16 ? value/127*max : +(old[0] || 0);
-    const high = cc === 17 ? value/127*max : +(old[1] || max);
-    document.querySelector('#selected-range').textContent = `${low.toFixed(4)} – ${high.toFixed(4)}`;
-  } else if (cc >= 30 && cc < 30 + names.length) { const i = cc - 30; norm[i] = bipolar.has(i) ? value/127*2-1 : value/127; render(); }
-  else if (cc >= 50 && cc < 50 + names.length) { const i = cc - 50; raw[i] = bipolar.has(i) ? (value/127*2-1)*domains[i] : value/127*domains[i]; render(); }
+  else if (cc >= 30 && cc < 30 + names.length) { const i = cc - 30; norm[i] = bipolar.has(i) ? value/127*2-1 : value/127; render(); }
 }
 function selectPorts() {
   const inputs = [...midi.inputs.values()], outputs = [...midi.outputs.values()];
@@ -108,7 +137,7 @@ document.querySelectorAll('[data-command]').forEach(button => button.onclick = (
 document.querySelector('#set-duration').onclick = () => sendCC(25, (+document.querySelector('#duration').value - 1) / 119 * 127);
 feature.onchange = refreshFeature;
 document.querySelector('#set-mode').onclick = () => { sendCC(21, +feature.value); sendCC(22, +document.querySelector('#mode').value); };
-document.querySelector('#set-range').onclick = () => { const i=+feature.value, max=domains[i]; sendCC(21,i); sendCC(23,+document.querySelector('#manual-low').value/max*127); sendCC(24,+document.querySelector('#manual-high').value/max*127); };
+document.querySelector('#set-range').onclick = () => { const i=+feature.value, max=domains[i]; sendCC(21,i); sendCC14(23,26,+document.querySelector('#manual-low').value/max*16383); sendCC14(24,27,+document.querySelector('#manual-high').value/max*16383); };
 refreshFeature(); render();
 </script>
 </body></html>

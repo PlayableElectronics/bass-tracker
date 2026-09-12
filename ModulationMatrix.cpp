@@ -30,9 +30,10 @@ float Shape(float value, float curve)
 void ModulationMatrix::Init()
 {
     for(size_t i = 0; i < kMaxModulationRoutes; ++i)
+    {
         routes_[i] = {};
-    for(size_t i = 0; i < kModulationDestinationCount; ++i)
-        smoothed_[i] = 0.0f;
+        smoothed_routes_[i] = 0.0f;
+    }
 }
 
 bool ModulationMatrix::SetRoute(size_t index, const ModulationRoute& route)
@@ -41,6 +42,7 @@ bool ModulationMatrix::SetRoute(size_t index, const ModulationRoute& route)
        || std::fabs(route.curve) > 1.0f || route.smoothing_seconds < 0.0f)
         return false;
     routes_[index] = route;
+    smoothed_routes_[index] = 0.0f;
     return true;
 }
 
@@ -58,30 +60,25 @@ ModulationFrame ModulationMatrix::Process(const ExpressionFrame& expression,
     {
         const ModulationRoute& route = routes_[i];
         if(!route.enabled)
+        {
+            smoothed_routes_[i] = 0.0f;
             continue;
+        }
         const size_t destination = static_cast<size_t>(route.destination);
         const float source = GetExpressionValue(expression.normalized, route.source);
-        target[destination] += route.amount * Shape(source, route.curve);
+        const float route_target = route.amount * Shape(source, route.curve);
+        float alpha = 1.0f;
+        if(route.smoothing_seconds > 0.0f && frame_seconds > 0.0f)
+            alpha = 1.0f - std::exp(-frame_seconds / route.smoothing_seconds);
+        smoothed_routes_[i] += alpha * (route_target - smoothed_routes_[i]);
+        target[destination] += smoothed_routes_[i];
     }
 
     ModulationFrame frame = {};
     for(size_t i = 0; i < kModulationDestinationCount; ++i)
     {
         target[i] = Clamp(target[i], -1.0f, 1.0f);
-        float alpha = 1.0f;
-        // Per-destination smoothing is selected as the slowest active route.
-        float smoothing = 0.0f;
-        for(size_t route_index = 0; route_index < kMaxModulationRoutes; ++route_index)
-        {
-            const ModulationRoute& route = routes_[route_index];
-            if(route.enabled && static_cast<size_t>(route.destination) == i
-               && route.smoothing_seconds > smoothing)
-                smoothing = route.smoothing_seconds;
-        }
-        if(smoothing > 0.0f && frame_seconds > 0.0f)
-            alpha = 1.0f - std::exp(-frame_seconds / smoothing);
-        smoothed_[i] += alpha * (target[i] - smoothed_[i]);
-        frame.values[i] = smoothed_[i];
+        frame.values[i] = target[i];
     }
     return frame;
 }
