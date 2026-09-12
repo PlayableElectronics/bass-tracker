@@ -10,8 +10,20 @@
 
 #include "AnalysisTypes.h"
 #include "EnvelopeFollower.h"
+#include "ExpressionBus.h"
+#include "ExpressionCalibration.h"
+#include "ExpressionMidiProtocol.h"
+#include "ModulationMatrix.h"
 #include "PitchDetector.h"
 #include "PitchTracker.h"
+
+#ifndef BASS_EXPRESSION_USB_MIDI
+#define BASS_EXPRESSION_USB_MIDI 0
+#endif
+
+#if BASS_EXPRESSION_USB_MIDI
+#include "hid/midi.h"
+#endif
 
 using namespace daisy;
 
@@ -26,6 +38,9 @@ constexpr size_t kAnalysisHop = 128;
 constexpr size_t kBufferCount = 3;
 constexpr float kLowPassCutoff = 1200.0f;
 constexpr float kDcCoefficient = 0.995f;
+constexpr float kAnalysisFrameSeconds = static_cast<float>(kAnalysisHop) / kAnalysisRate;
+constexpr uint32_t kExpressionLogDivider = 8;
+constexpr uint32_t kExpressionMidiDivider = 10;
 
 struct AnalysisBlock
 {
@@ -60,15 +75,24 @@ static float hop_filtered_sum_squares = 0.0f;
 static size_t hop_sample_count = 0;
 static bass::EnvelopeFollower envelope_follower;
 static bass::PitchTracker pitch_tracker;
+static bass::ExpressionAnalyzer expression_analyzer;
+static bass::ExpressionCalibration expression_calibration;
+static bass::ModulationMatrix modulation_matrix;
+static bass::ExpressionMidiProtocol expression_midi_protocol;
 static volatile float monitor_frequency_hz = 0.0f;
 static volatile bool monitor_pitch_valid = false;
 static float monitor_phase = 0.0f;
 static float monitor_gain = 0.0f;
 
+#if BASS_EXPRESSION_USB_MIDI
+static MidiUsbHandler expression_midi;
+#endif
+
 // Logger::Print uses a 128-byte asynchronous buffer.  A full diagnostic CSV
 // record is larger than that, so sending it in Logger chunks corrupts records
 // when a USB transfer is still active.  These two buffers are alternated: when
 // the next transfer is accepted, the prior buffer is no longer in use by USB.
+#if !BASS_EXPRESSION_USB_MIDI
 class CsvUsbLogger
 {
   public:
@@ -106,6 +130,7 @@ class CsvUsbLogger
 UsbHandle CsvUsbLogger::usb_;
 char CsvUsbLogger::buffers_[CsvUsbLogger::kBufferCount][CsvUsbLogger::kBufferSize];
 size_t CsvUsbLogger::next_buffer_ = 0;
+#endif
 
 float LowPassCoefficient()
 {
@@ -130,6 +155,7 @@ void ReleaseAnalysisBlock(int index)
         processing_buffer = -1;
 }
 
+#if !BASS_EXPRESSION_USB_MIDI
 void PrintCsvHeader()
 {
     CsvUsbLogger::PrintLine("seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,"
@@ -139,6 +165,75 @@ void PrintCsvHeader()
                             "pre_stability_freq_hz,final_tracked_freq_hz,family_promoted,stability_bypass");
 }
 
+void PrintExpressionHeader()
+{
+    CsvUsbLogger::PrintLine(
+        "expr,seq,ms,calibration_state,amp_raw,attack_raw,brightness_raw,periodicity_raw,"
+        "tracker_conf_raw,competition_raw,octave_tension_raw,noise_raw,decay_raw,"
+        "motion_raw,instability_raw,amp_norm,attack_norm,brightness_norm,periodicity_norm,"
+        "tracker_conf_norm,competition_norm,octave_tension_norm,noise_norm,decay_norm,"
+        "motion_norm,instability_norm");
+}
+
+void PrintExpressionRow(const bass::BassAnalysis& analysis)
+{
+    if(analysis.sequence % kExpressionLogDivider != 0)
+        return;
+    const bass::ExpressionValues& raw = analysis.expression.raw;
+    const bass::ExpressionValues& normalized = analysis.expression.normalized;
+    const bass::CalibrationStatus status = expression_calibration.Status();
+    CsvUsbLogger::PrintLine(
+        "expr,%lu,%lu,%d,"
+        FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 ","
+        FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 ","
+        FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 ","
+        FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3 ","
+        FLT_FMT3 "," FLT_FMT3 "," FLT_FMT3,
+        static_cast<unsigned long>(analysis.sequence),
+        static_cast<unsigned long>(analysis.ms),
+        static_cast<int>(status.state),
+        FLT_VAR3(raw.values[0]), FLT_VAR3(raw.values[1]), FLT_VAR3(raw.values[2]),
+        FLT_VAR3(raw.values[3]), FLT_VAR3(raw.values[4]), FLT_VAR3(raw.values[5]),
+        FLT_VAR3(raw.values[6]), FLT_VAR3(raw.values[7]), FLT_VAR3(raw.values[8]),
+        FLT_VAR3(raw.values[9]), FLT_VAR3(raw.values[10]),
+        FLT_VAR3(normalized.values[0]), FLT_VAR3(normalized.values[1]),
+        FLT_VAR3(normalized.values[2]), FLT_VAR3(normalized.values[3]),
+        FLT_VAR3(normalized.values[4]), FLT_VAR3(normalized.values[5]),
+        FLT_VAR3(normalized.values[6]), FLT_VAR3(normalized.values[7]),
+        FLT_VAR3(normalized.values[8]), FLT_VAR3(normalized.values[9]),
+        FLT_VAR3(normalized.values[10]));
+}
+#endif
+
+#if BASS_EXPRESSION_USB_MIDI
+void EmitExpressionMidi(const bass::BassAnalysis& analysis)
+{
+    if(analysis.sequence % kExpressionMidiDivider != 0)
+        return;
+    uint8_t bytes[96] = {};
+    const size_t size = expression_midi_protocol.BuildTelemetry(
+        analysis.expression, expression_calibration.Status(), bytes, sizeof(bytes));
+    if(size > 0)
+        expression_midi.SendMessage(bytes, size);
+}
+
+void ProcessExpressionMidiControls()
+{
+    expression_midi.Listen();
+    while(expression_midi.HasEvents())
+    {
+        MidiEvent event = expression_midi.PopEvent();
+        if(event.type != ControlChange)
+            continue;
+        const ControlChangeEvent control = event.AsControlChange();
+        expression_midi_protocol.HandleControlChange(
+            static_cast<uint8_t>(control.channel), control.control_number,
+            control.value, expression_calibration);
+    }
+}
+#endif
+
+#if !BASS_EXPRESSION_USB_MIDI
 void PrintCsvRow(const bass::BassAnalysis& analysis)
 {
     const bass::PitchCandidate empty = {0.0f, 0.0f, 0};
@@ -186,6 +281,7 @@ void PrintCsvRow(const bass::BassAnalysis& analysis)
         analysis.family_promoted ? 1 : 0,
         analysis.stability_bypass ? 1 : 0);
 }
+#endif
 
 void AnalyzeBlock(const AnalysisBlock& block)
 {
@@ -220,9 +316,24 @@ void AnalyzeBlock(const AnalysisBlock& block)
     result.pitch_valid = tracked.valid;
     result.family_promoted = tracked.family_promoted;
     result.stability_bypass = tracked.stability_bypass;
+    result.expression = expression_analyzer.Update(
+        result.sequence, result.ms, tracked.frequency_hz,
+        tracked.pre_stability_frequency_hz, tracked.confidence, tracked.valid,
+        result.candidates, result.candidate_count, block.signal,
+        block.input_rms, block.filtered_rms);
+    expression_calibration.Update(result.expression.raw, kAnalysisFrameSeconds);
+    result.expression.normalized = expression_calibration.Normalize(result.expression.raw);
+    // No routes are active in this milestone. Processing the fixed-size matrix
+    // here verifies its real-time boundary without introducing a synth engine.
+    modulation_matrix.Process(result.expression, kAnalysisFrameSeconds);
     monitor_frequency_hz = tracked.frequency_hz;
     monitor_pitch_valid = tracked.valid;
+#if BASS_EXPRESSION_USB_MIDI
+    EmitExpressionMidi(result);
+#else
     PrintCsvRow(result);
+    PrintExpressionRow(result);
+#endif
 }
 
 void AudioCallback(AudioHandle::InterleavingInputBuffer in,
@@ -331,12 +442,26 @@ int main(void)
     hw.SetAudioBlockSize(kAudioBlockSize);
     envelope_follower.Init(kSampleRate);
     pitch_tracker.Init();
+    expression_analyzer.Init();
+    expression_calibration.Init();
+    modulation_matrix.Init();
+    expression_midi_protocol.Init();
+#if BASS_EXPRESSION_USB_MIDI
+    MidiUsbHandler::Config midi_config;
+    expression_midi.Init(midi_config);
+    expression_midi.StartReceive();
+#else
     hw.StartLog(false);
     PrintCsvHeader();
+    PrintExpressionHeader();
+#endif
     hw.StartAudio(AudioCallback);
 
     while(1)
     {
+#if BASS_EXPRESSION_USB_MIDI
+        ProcessExpressionMidiControls();
+#endif
         int index = -1;
         if(TakeAnalysisBlock(index))
         {

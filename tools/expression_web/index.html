@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bass expression calibration</title>
+<style>
+  :root { color-scheme: dark; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  body { margin: 2rem auto; max-width: 1100px; padding: 0 1rem; background: #15181c; color: #e8edf0; }
+  h1 { font-size: 1.35rem; } h2 { font-size: 1rem; margin-top: 2rem; }
+  button, select, input { background: #252b32; color: inherit; border: 1px solid #53616d; border-radius: .25rem; padding: .45rem; }
+  button { cursor: pointer; } .controls { display:flex; flex-wrap:wrap; align-items:end; gap:.75rem; }
+  label { display:grid; gap:.3rem; font-size:.78rem; } .status { color:#8fd3ff; }
+  table { border-collapse: collapse; width:100%; margin-top:.7rem; font-size:.78rem; }
+  th,td { padding:.38rem; border-bottom:1px solid #303a44; text-align:left; }
+  .meter { width: 100%; height:.55rem; background:#2b3239; border-radius: .4rem; overflow:hidden; }
+  .meter > i { display:block; height:100%; width:0%; background:#6dd7a3; transition:width .08s linear; }
+  .bipolar { background:linear-gradient(to right,#a87bff 0 50%,#2b3239 50%); }
+  .bipolar > i { background:#ffd166; margin-left:50%; }
+  .muted { color:#a8b1ba; font-size:.85rem; line-height:1.45; }
+</style>
+<body>
+<h1>Bass expression calibration / monitor</h1>
+<p class="muted">WebMIDI monitor for the optional <code>EXPRESSION_USB_MIDI=1</code> firmware build. The normal build remains CDC diagnostic logging. Calibration never adapts during FROZEN performance.</p>
+
+<section class="controls">
+  <label>MIDI input <select id="input"><option>Connect WebMIDI first</option></select></label>
+  <label>MIDI output <select id="output"><option>Connect WebMIDI first</option></select></label>
+  <button id="connect">Connect WebMIDI</button>
+  <button data-command="1">Start calibration</button>
+  <button data-command="2">Freeze</button>
+  <button data-command="3">Reset</button>
+  <label>Duration (1–120 s)<input id="duration" type="number" min="1" max="120" value="30"></label>
+  <button id="set-duration">Set duration</button>
+</section>
+
+<p>State: <strong id="state">UNAVAILABLE</strong> · progress: <strong id="progress">—</strong> · learned amplitude floor/range: <strong id="amplitude-range">—</strong></p>
+
+<h2>Raw and calibrated expression</h2>
+<table><thead><tr><th>source</th><th>raw</th><th>normalized</th><th>meter</th></tr></thead><tbody id="features"></tbody></table>
+
+<h2>Selected feature range</h2>
+<section class="controls">
+  <label>Feature <select id="feature"></select></label>
+  <label>Mode <select id="mode"><option value="0">AUTO</option><option value="1">MANUAL</option><option value="2">LOCKED</option></select></label>
+  <button id="set-mode">Set mode</button>
+  <label>Manual low (raw)<input id="manual-low" type="number" min="0" step="any" value="0"></label>
+  <label>Manual high (raw)<input id="manual-high" type="number" min="0" step="any" value="1"></label>
+  <button id="set-range">Set manual range</button>
+</section>
+<p>Selected learned range: <strong id="selected-range">—</strong></p>
+<p class="muted">Manual ranges are feature-domain values, not audio gain. AUTO restores the frozen learned range; LOCKED snapshots the current active range. Reloading the page does not alter the device.</p>
+
+<script>
+const channel = 15, status = 0xB0 | channel;
+const names = ['amplitude','attack_strength','brightness','periodicity','tracker_confidence','candidate_competition','octave_tension','noise_transient','decay_rate','pitch_motion','pitch_instability'];
+const domains = [1,1,1,1,1,1,1,1,1,600,600];
+const bipolar = new Set([9]);
+let midi = null, input = null, output = null;
+const raw = Array(names.length).fill(0), norm = Array(names.length).fill(0);
+const stateNames = ['UNCALIBRATED','CALIBRATING','FROZEN'];
+const body = document.querySelector('#features');
+body.innerHTML = names.map((name, i) => `<tr><td>${name}</td><td id="raw-${i}">0</td><td id="norm-${i}">0</td><td><div class="meter ${bipolar.has(i)?'bipolar':''}"><i id="meter-${i}"></i></div></td></tr>`).join('');
+const feature = document.querySelector('#feature');
+feature.innerHTML = names.map((name,i) => `<option value="${i}">${name}</option>`).join('');
+
+function midiValue(v) { return Math.max(0, Math.min(127, Math.round(v))); }
+function sendCC(controller, value) { if (output) output.send([status, controller, midiValue(value)]); }
+function refreshFeature() { const i = +feature.value; document.querySelector('#manual-low').max = domains[i]; document.querySelector('#manual-high').max = domains[i]; }
+function render() {
+  names.forEach((_, i) => {
+    document.querySelector(`#raw-${i}`).textContent = raw[i].toFixed(i >= 9 ? 1 : 3);
+    document.querySelector(`#norm-${i}`).textContent = norm[i].toFixed(3);
+    const meter = document.querySelector(`#meter-${i}`);
+    if (bipolar.has(i)) { meter.style.marginLeft = `${50 + Math.min(0,norm[i])*50}%`; meter.style.width = `${Math.abs(norm[i])*50}%`; }
+    else { meter.style.marginLeft = '0'; meter.style.width = `${norm[i]*100}%`; }
+  });
+}
+function handleMidi(event) {
+  const [s, cc, value] = event.data;
+  if (s !== status || value === undefined) return;
+  if (cc === 12) document.querySelector('#state').textContent = stateNames[value] || 'UNKNOWN';
+  else if (cc === 13) document.querySelector('#progress').textContent = `${Math.round(value / 127 * 100)}%`;
+  else if (cc === 14 || cc === 15) {
+    const old = document.querySelector('#amplitude-range').textContent.split(' – ');
+    const low = cc === 14 ? value/127 : +(old[0] || 0);
+    const high = cc === 15 ? value/127 : +(old[1] || 1);
+    document.querySelector('#amplitude-range').textContent = `${low.toFixed(4)} – ${high.toFixed(4)}`;
+  } else if (cc === 16 || cc === 17) {
+    const old = document.querySelector('#selected-range').textContent.split(' – '), max = domains[+feature.value];
+    const low = cc === 16 ? value/127*max : +(old[0] || 0);
+    const high = cc === 17 ? value/127*max : +(old[1] || max);
+    document.querySelector('#selected-range').textContent = `${low.toFixed(4)} – ${high.toFixed(4)}`;
+  } else if (cc >= 30 && cc < 30 + names.length) { const i = cc - 30; norm[i] = bipolar.has(i) ? value/127*2-1 : value/127; render(); }
+  else if (cc >= 50 && cc < 50 + names.length) { const i = cc - 50; raw[i] = bipolar.has(i) ? (value/127*2-1)*domains[i] : value/127*domains[i]; render(); }
+}
+function selectPorts() {
+  const inputs = [...midi.inputs.values()], outputs = [...midi.outputs.values()];
+  for (const [element, ports] of [[document.querySelector('#input'),inputs],[document.querySelector('#output'),outputs]]) {
+    element.innerHTML = ports.map(p=>`<option value="${p.id}">${p.name || p.id}</option>`).join('') || '<option>No MIDI ports</option>';
+  }
+  input = inputs[0] || null; output = outputs[0] || null;
+  if (input) input.onmidimessage = handleMidi;
+}
+document.querySelector('#connect').onclick = async () => { try { midi = await navigator.requestMIDIAccess(); midi.onstatechange = selectPorts; selectPorts(); document.querySelector('#state').textContent = 'CONNECTED'; } catch(e) { document.querySelector('#state').textContent = `ERROR: ${e.message}`; }};
+document.querySelector('#input').onchange = e => { if (input) input.onmidimessage = null; input = midi.inputs.get(e.target.value); if (input) input.onmidimessage = handleMidi; };
+document.querySelector('#output').onchange = e => output = midi.outputs.get(e.target.value);
+document.querySelectorAll('[data-command]').forEach(button => button.onclick = () => sendCC(20, +button.dataset.command));
+document.querySelector('#set-duration').onclick = () => sendCC(25, (+document.querySelector('#duration').value - 1) / 119 * 127);
+feature.onchange = refreshFeature;
+document.querySelector('#set-mode').onclick = () => { sendCC(21, +feature.value); sendCC(22, +document.querySelector('#mode').value); };
+document.querySelector('#set-range').onclick = () => { const i=+feature.value, max=domains[i]; sendCC(21,i); sendCC(23,+document.querySelector('#manual-low').value/max*127); sendCC(24,+document.querySelector('#manual-high').value/max*127); };
+refreshFeature(); render();
+</script>
+</body></html>

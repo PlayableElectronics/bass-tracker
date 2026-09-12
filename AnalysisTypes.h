@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "ExpressionBus.h"
+
 namespace bass
 {
 constexpr size_t kMaxPitchCandidates = 6;
@@ -44,5 +46,8 @@ struct BassAnalysis
     bool stability_bypass;
     PitchCandidate candidates[kMaxPitchCandidates];
     size_t candidate_count;
+    // Raw physical analysis and calibrated expression values are retained
+    // alongside, not folded back into, the frozen pitch tracker.
+    ExpressionFrame expression;
 };
 } // namespace bass

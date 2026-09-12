@@ -4,6 +4,11 @@ Tracker v2 is a monophonic bass analyzer for Daisy Seed. The firmware passes
 the left codec input to both outputs and emits a CSV analysis record for every
 completed pitch frame over USB serial.
 
+The pitch path is intentionally only one part of the instrument front end.
+`docs/ExpressionArchitecture.md` documents the separate raw/calibrated
+expression bus and future resynthesis modulation boundary. It does not alter
+pitch tracking or add a synthesis engine.
+
 ## Signal path
 
 - 48 kHz audio, 16-sample blocks
@@ -84,6 +89,28 @@ seq,ms,raw_freq_hz,tracked_freq_hz,raw_confidence,tracked_confidence,envelope,at
 
 Use a suitable instrument input, buffer or DI/preamp for a passive bass
 pickup. The firmware expects the Daisy audio codec input, not a GPIO pin.
+
+## Expression calibration and WebMIDI
+
+The normal firmware retains CDC CSV diagnostics. In addition to the existing
+numeric frame rows it emits compact `expr` telemetry lines at about 11.7 Hz;
+they contain raw and normalized expression values and can be ignored by the
+existing capture tool.
+
+Expression calibration is explicit and finite:
+
+```text
+UNCALIBRATED -> START -> CALIBRATING -> FREEZE (or timed freeze) -> FROZEN
+```
+
+Only `CALIBRATING` updates learned ranges. In `FROZEN` performance the
+calibration is deterministic until the musician starts a new calibration.
+
+The optional `EXPRESSION_USB_MIDI=1` build exposes that state and the
+expression frame to [the WebMIDI calibration page](tools/expression_web/).
+This installed libDaisy version cannot expose CDC and MIDI simultaneously, so
+that flag deliberately replaces CDC only in that alternate build. See
+`tools/expression_web/README.md` for the protocol and browser workflow.
 
 ## Capturing labelled tests
 
