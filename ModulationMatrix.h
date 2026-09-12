@@ -54,10 +54,13 @@ class ModulationMatrix
     void Init();
     bool SetRoute(size_t index, const ModulationRoute& route);
     const ModulationRoute& GetRoute(size_t index) const;
+    void SetUncertaintyInfluence(float influence);
+    float UncertaintyInfluence() const;
     ModulationFrame Process(const ExpressionFrame& expression, float frame_seconds);
 
   private:
     ModulationRoute routes_[kMaxModulationRoutes] = {};
     float smoothed_routes_[kMaxModulationRoutes] = {};
+    float uncertainty_influence_ = 1.0f;
 };
 } // namespace bass

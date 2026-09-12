@@ -212,6 +212,23 @@ int main()
                static_cast<size_t>(bass::ModulationDestination::ModeCoupling)] == 0.0f);
     assert(!matrix.SetRoute(bass::kMaxModulationRoutes, route));
 
+    bass::ModulationMatrix uncertainty_matrix;
+    uncertainty_matrix.Init();
+    bass::ModulationRoute uncertainty_route = {};
+    uncertainty_route.source = bass::ExpressionFeature::CandidateCompetition;
+    uncertainty_route.destination = bass::ModulationDestination::ModeCoupling;
+    uncertainty_route.amount = 1.0f;
+    uncertainty_route.enabled = true;
+    assert(uncertainty_matrix.SetRoute(0, uncertainty_route));
+    frame.normalized.values[static_cast<size_t>(
+        bass::ExpressionFeature::CandidateCompetition)] = 1.0f;
+    uncertainty_matrix.SetUncertaintyInfluence(0.0f);
+    assert(uncertainty_matrix.Process(frame, kFrameSeconds).values[
+               static_cast<size_t>(bass::ModulationDestination::ModeCoupling)] == 0.0f);
+    uncertainty_matrix.SetUncertaintyInfluence(1.0f);
+    assert(uncertainty_matrix.Process(frame, kFrameSeconds).values[
+               static_cast<size_t>(bass::ModulationDestination::ModeCoupling)] > 0.99f);
+
     bass::ResynthesisEngine engine;
     engine.Init(48000.0f);
     bass::ResynthesisEngine::BaseParameters base = {};
@@ -246,5 +263,58 @@ int main()
         engine_frame.pitch_hz = 41.0f + static_cast<float>(block) * 0.45f;
     }
     assert(maximum_output > 0.001f);
+
+    bass::ExpressionMidiProtocol sound_midi;
+    sound_midi.Init();
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlEngineParameter,
+                                          3, midi_calibration, &engine, &engine_matrix));
+    const uint16_t feedback_value = bass::ExpressionMidiProtocol::EncodeUnipolar14(0.75f);
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlEngineValueMsb,
+                                          feedback_value >> 7, midi_calibration, &engine, &engine_matrix));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlEngineValueLsb,
+                                          feedback_value & 0x7f, midi_calibration, &engine, &engine_matrix));
+    assert(Near(engine.GetBaseParameterNormalized(3), 0.75f, 0.0001f));
+
+    const uint16_t ratio_value = bass::ExpressionMidiProtocol::EncodeUnipolar14((2.3f - 0.5f) / 4.5f);
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlModeSelect,
+                                          2, midi_calibration, &engine, &engine_matrix));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlModeRatioMsb,
+                                          ratio_value >> 7, midi_calibration, &engine, &engine_matrix));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlModeRatioLsb,
+                                          ratio_value & 0x7f, midi_calibration, &engine, &engine_matrix));
+    assert(Near(engine.GetModeRatio(2), 2.3f, 0.001f));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlModeWeightMsb,
+                                          0x40, midi_calibration, &engine, &engine_matrix));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlModeWeightLsb,
+                                          0, midi_calibration, &engine, &engine_matrix));
+    assert(Near(engine.GetModeWeight(2), 8192.0f / 16383.0f, 0.0001f));
+
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlUncertaintyMsb,
+                                          0, midi_calibration, &engine, &engine_matrix));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlUncertaintyLsb,
+                                          0, midi_calibration, &engine, &engine_matrix));
+    assert(Near(engine_matrix.UncertaintyInfluence(), 0.0f, 0.0001f));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlRouteSelect,
+                                          12, midi_calibration, &engine, &engine_matrix));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlRouteSource,
+                                          static_cast<uint8_t>(bass::ExpressionFeature::Brightness),
+                                          midi_calibration, &engine, &engine_matrix));
+    assert(engine_matrix.GetRoute(12).source == bass::ExpressionFeature::Brightness);
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlMacroSelect,
+                                          static_cast<uint8_t>(bass::ResynthesisEngine::Macro::Softness),
+                                          midi_calibration, &engine, &engine_matrix));
+    const uint16_t softness_value = bass::ExpressionMidiProtocol::EncodeUnipolar14(0.6f);
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlMacroValueMsb,
+                                          softness_value >> 7, midi_calibration, &engine, &engine_matrix));
+    assert(sound_midi.HandleControlChange(15, bass::ExpressionMidiProtocol::kControlMacroValueLsb,
+                                          softness_value & 0x7f, midi_calibration, &engine, &engine_matrix));
+    assert(Near(engine.GetMacro(bass::ResynthesisEngine::Macro::Softness), 0.6f, 0.0001f));
+
+    uint8_t sound_telemetry[512] = {};
+    const bass::ModulationFrame final_modulation = engine_matrix.Process(engine_frame, kFrameSeconds);
+    const size_t sound_telemetry_size = sound_midi.BuildTelemetry(
+        engine_frame, midi_calibration.Status(), sound_telemetry, sizeof(sound_telemetry),
+        &final_modulation, &engine, &engine_matrix);
+    assert(sound_telemetry_size > 280);
     return 0;
 }

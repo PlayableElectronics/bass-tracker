@@ -25,6 +25,14 @@ float Shape(float value, float curve)
     }
     return value;
 }
+
+bool IsUncertaintySource(ExpressionFeature source)
+{
+    return source == ExpressionFeature::CandidateCompetition
+           || source == ExpressionFeature::OctaveTension
+           || source == ExpressionFeature::PitchInstability
+           || source == ExpressionFeature::NoiseTransient;
+}
 } // namespace
 
 void ModulationMatrix::Init()
@@ -34,6 +42,7 @@ void ModulationMatrix::Init()
         routes_[i] = {};
         smoothed_routes_[i] = 0.0f;
     }
+    uncertainty_influence_ = 1.0f;
 }
 
 bool ModulationMatrix::SetRoute(size_t index, const ModulationRoute& route)
@@ -44,6 +53,16 @@ bool ModulationMatrix::SetRoute(size_t index, const ModulationRoute& route)
     routes_[index] = route;
     smoothed_routes_[index] = 0.0f;
     return true;
+}
+
+void ModulationMatrix::SetUncertaintyInfluence(float influence)
+{
+    uncertainty_influence_ = Clamp(influence, 0.0f, 1.0f);
+}
+
+float ModulationMatrix::UncertaintyInfluence() const
+{
+    return uncertainty_influence_;
 }
 
 const ModulationRoute& ModulationMatrix::GetRoute(size_t index) const
@@ -66,7 +85,9 @@ ModulationFrame ModulationMatrix::Process(const ExpressionFrame& expression,
         }
         const size_t destination = static_cast<size_t>(route.destination);
         const float source = GetExpressionValue(expression.normalized, route.source);
-        const float route_target = route.amount * Shape(source, route.curve);
+        const float influence = IsUncertaintySource(route.source)
+                                    ? uncertainty_influence_ : 1.0f;
+        const float route_target = influence * route.amount * Shape(source, route.curve);
         float alpha = 1.0f;
         if(route.smoothing_seconds > 0.0f && frame_seconds > 0.0f)
             alpha = 1.0f - std::exp(-frame_seconds / route.smoothing_seconds);

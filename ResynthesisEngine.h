@@ -14,6 +14,17 @@ class ResynthesisEngine
 {
   public:
     static constexpr size_t kModeCount = 5;
+    static constexpr size_t kBaseParameterCount = 8;
+    static constexpr size_t kMacroCount = 5;
+
+    enum class Macro : uint8_t
+    {
+        Softness = 0,
+        Interaction,
+        Chaos,
+        AttackBody,
+        Harmonicity,
+    };
 
     struct BaseParameters
     {
@@ -29,7 +40,15 @@ class ResynthesisEngine
 
     void Init(float sample_rate);
     void SetBaseParameters(const BaseParameters& parameters);
+    const BaseParameters& GetBaseParameters() const;
+    bool SetBaseParameterNormalized(size_t index, float normalized);
+    float GetBaseParameterNormalized(size_t index) const;
     bool SetModeRatio(size_t index, float ratio);
+    float GetModeRatio(size_t index) const;
+    bool SetModeWeight(size_t index, float weight);
+    float GetModeWeight(size_t index) const;
+    bool SetMacro(Macro macro, float value);
+    float GetMacro(Macro macro) const;
     void SetFrame(const ExpressionFrame& expression,
                   const ModulationFrame& modulation,
                   float frame_seconds);
@@ -66,8 +85,12 @@ class ResynthesisEngine
     volatile float pending_brightness_ = 0.0f;
     volatile float pending_noise_ = 0.0f;
     volatile float pending_texture_ = 0.0f;
+    volatile float harmonicity_ = 0.0f;
+    volatile float attack_body_ = 0.0f;
     uint32_t random_state_ = 0x13579bdfu;
-    float mode_ratios_[kModeCount] = {};
+    volatile float mode_ratios_[kModeCount] = {};
+    volatile float mode_weights_[kModeCount] = {};
+    float macros_[kMacroCount] = {};
     Mode modes_[kModeCount] = {};
 };
 } // namespace bass

@@ -16,6 +16,8 @@
   .meter > i { display:block; height:100%; width:0%; background:#6dd7a3; transition:width .08s linear; }
   .bipolar { background:linear-gradient(to right,#a87bff 0 50%,#2b3239 50%); }
   .bipolar > i { background:#ffd166; margin-left:50%; }
+  input[type=range] { width: 14rem; padding: 0; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(18rem,1fr)); gap:.7rem; }
   .muted { color:#a8b1ba; font-size:.85rem; line-height:1.45; }
 </style>
 <body>
@@ -67,11 +69,32 @@
 <tr><td>output_texture</td><td>attack_strength</td><td>attack interaction texture</td></tr>
 </tbody></table>
 
+<h2>Sound design</h2>
+<p class="muted">These controls are available in <code>RESYNTH_ENGINE=1</code> firmware. Values are sent as 14-bit controls and are bounded by the engine. The <em>Reference / Original</em> preset restores the cbb8120 defaults; sound presets do not contain calibration.</p>
+<div class="controls"><label>Uncertainty influence <input id="uncertainty" type="range" min="0" max="1" step="0.0001" value="1"><output id="uncertainty-value">1.0000</output></label></div>
+<div id="macros" class="grid"></div>
+<h3>Base parameters</h3><div id="base-parameters" class="grid"></div>
+<h3>Mode structure</h3><table><thead><tr><th>mode</th><th>ratio</th><th>weight</th></tr></thead><tbody id="modes"></tbody></table>
+
+<h2>Modulation matrix</h2>
+<p class="muted">Each route is smoothed independently before summing at its destination. Empty/disabled slots are safe. Route values are edited on the fixed 16-slot matrix.</p>
+<table><thead><tr><th>slot</th><th>on</th><th>source</th><th>destination</th><th>amount</th><th>curve</th><th>smoothing (ms)</th></tr></thead><tbody id="routes"></tbody></table>
+<table><thead><tr><th>live destination</th><th>modulation value</th></tr></thead><tbody id="destination-values"></tbody></table>
+
+<h2>Sound presets</h2>
+<div class="controls"><button id="reference">Reference / Original</button><button id="export">Export Sound JSON</button><label>Import Sound JSON<input id="import" type="file" accept="application/json"></label></div>
+
 <script>
 const channel = 15, status = 0xB0 | channel;
 const names = ['amplitude','attack_strength','brightness','periodicity','tracker_confidence','candidate_competition','octave_tension','noise_transient','decay_rate','pitch_motion','pitch_instability'];
 const domains = [1,1,1,1,1,1,1,1,1,600,600];
 const bipolar = new Set([9]);
+const destinationNames = ['excitation_complexity','spectral_distribution','instability_interaction','mode_coupling','stochastic_excitation','resonator_damping','structural_morph','excitation_amount','upper_mode_energy','feedback_amount','nonlinearity','damping','ratio_spread','output_texture'];
+const baseNames = ['excitation_amount','upper_mode_energy','mode_coupling','feedback','nonlinearity','damping','ratio_spread','output_texture'];
+const baseRanges = ['0…1','0…1','0…0.42','0…0.22','0…0.42','0.04…0.70','-0.10…0.10','0…1'];
+const macroNames = ['softness','interaction','chaos','attack_body','harmonicity'];
+const routeState = Array.from({length:16}, () => ({enabled:false,source:0,destination:0,amount:0,curve:0,smoothing:0}));
+const baseState = [.45,.2,.06/.42,.035/.22,.08/.42,.12/.66,.5,.15], modeRatios = [1,1.37,1.93,2.71,3.89], modeWeights = [.58,.30,.22,.16,.11], macroState = Array(5).fill(0);
 let midi = null, input = null, output = null;
 const raw = Array(names.length).fill(0), norm = Array(names.length).fill(0);
 const received14 = new Map();
@@ -88,6 +111,7 @@ function sendCC14(msb, lsb, value) {
   const encoded = encode14(value);
   if (output) { output.send([status, msb, encoded >> 7]); output.send([status, lsb, encoded & 0x7f]); }
 }
+function send14(msb, lsb, normalized) { sendCC14(msb, lsb, encode14(normalized * 16383)); }
 function decode14(value) { return Math.max(0, Math.min(16383, value)) / 16383; }
 function decodeSigned14(value) { return decode14(value) * 2 - 1; }
 function receive14(msb, lsb, value) {
@@ -98,6 +122,28 @@ function receive14(msb, lsb, value) {
   return received14.get(msb);
 }
 function refreshFeature() { const i = +feature.value; document.querySelector('#manual-low').max = domains[i]; document.querySelector('#manual-high').max = domains[i]; }
+function labeledRange(id, label, min, max, step, value, outputId) { return `<label>${label} <input id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${value}"><output id="${outputId}">${Number(value).toFixed(4)}</output></label>`; }
+function renderSoundControls() {
+  document.querySelector('#macros').innerHTML = macroNames.map((name,i)=>labeledRange(`macro-${i}`,name,0,1,0.0001,macroState[i],`macro-value-${i}`)).join('');
+  document.querySelector('#base-parameters').innerHTML = baseNames.map((name,i)=>`<label>${name} <small>${baseRanges[i]}</small><input id="base-${i}" type="range" min="0" max="1" step="0.0001" value="${baseState[i]}"><output id="base-value-${i}">${baseState[i].toFixed(4)}</output></label>`).join('');
+  document.querySelector('#modes').innerHTML = modeRatios.map((ratio,i)=>`<tr><td>mode ${i+1}</td><td>${labeledRange(`ratio-${i}`,'',0.5,5,0.0001,ratio,`ratio-value-${i}`)}</td><td>${labeledRange(`weight-${i}`,'',0,1,0.0001,modeWeights[i],`weight-value-${i}`)}</td></tr>`).join('');
+  document.querySelector('#routes').innerHTML = routeState.map((route,i)=>`<tr><td>${i+1}</td><td><input id="route-enabled-${i}" type="checkbox" ${route.enabled?'checked':''}></td><td><select id="route-source-${i}">${names.map((n,j)=>`<option value="${j}" ${j===route.source?'selected':''}>${n}</option>`).join('')}</select></td><td><select id="route-destination-${i}">${destinationNames.map((n,j)=>`<option value="${j}" ${j===route.destination?'selected':''}>${n}</option>`).join('')}</select></td><td><input id="route-amount-${i}" type="number" min="-1" max="1" step="0.0001" value="${route.amount.toFixed(4)}"></td><td><input id="route-curve-${i}" type="number" min="-1" max="1" step="0.0001" value="${route.curve.toFixed(4)}"></td><td><input id="route-smoothing-${i}" type="number" min="0" max="2000" step="0.1" value="${route.smoothing.toFixed(1)}"></td></tr>`).join('');
+  document.querySelector('#destination-values').innerHTML = destinationNames.map((name,i)=>`<tr><td>${name}</td><td id="destination-${i}">0.000</td></tr>`).join('');
+}
+function sendEngineParameter(index, value) { sendCC(40,index); send14(41,42,value); }
+function sendMode(index, ratio, weight) { sendCC(43,index); send14(44,45,(ratio-0.5)/4.5); send14(46,47,weight); }
+function sendRoute(index) { const r=routeState[index]; sendCC(48,index); sendCC(49,r.enabled?1:0); sendCC(50,r.source); sendCC(51,r.destination); sendCC14(52,53,(r.amount+1)*0.5*16383); sendCC14(54,55,(r.curve+1)*0.5*16383); sendCC14(56,57,r.smoothing/2000*16383); }
+function soundJSON() { return {format:'bass-tracker-sound-v1',base_parameters:baseState,mode_ratios:modeRatios,mode_weights:modeWeights,macros:macroState,uncertainty_influence:+document.querySelector('#uncertainty').value,routes:routeState}; }
+function bindSoundControls() {
+  for (let i=0;i<8;++i) document.querySelector(`#base-${i}`).oninput=e=>{baseState[i]=+e.target.value; document.querySelector(`#base-value-${i}`).textContent=baseState[i].toFixed(4); sendEngineParameter(i,baseState[i]);};
+  for (let i=0;i<5;++i) {
+    document.querySelector(`#macro-${i}`).oninput=e=>{macroState[i]=+e.target.value; document.querySelector(`#macro-value-${i}`).textContent=macroState[i].toFixed(4); sendCC(58,i); send14(59,60,macroState[i]);};
+    document.querySelector(`#ratio-${i}`).oninput=e=>{modeRatios[i]=+e.target.value; document.querySelector(`#ratio-value-${i}`).textContent=modeRatios[i].toFixed(4); sendMode(i,modeRatios[i],modeWeights[i]);};
+    document.querySelector(`#weight-${i}`).oninput=e=>{modeWeights[i]=+e.target.value; document.querySelector(`#weight-value-${i}`).textContent=modeWeights[i].toFixed(4); sendMode(i,modeRatios[i],modeWeights[i]);};
+  }
+  routeState.forEach((route,i)=>['enabled','source','destination','amount','curve','smoothing'].forEach(field=>document.querySelector(`#route-${field}-${i}`).onchange=e=>{route[field]=field==='enabled'?e.target.checked:(field==='source'||field==='destination'?+e.target.value:+e.target.value); sendRoute(i);}));
+}
+function applySound(sound) { if (!sound || sound.format !== 'bass-tracker-sound-v1') throw new Error('unsupported sound preset'); sound.base_parameters.forEach((v,i)=>{baseState[i]=Math.max(0,Math.min(1,+v));}); sound.mode_ratios.forEach((v,i)=>{modeRatios[i]=+v;}); sound.mode_weights.forEach((v,i)=>{modeWeights[i]=+v;}); sound.macros.forEach((v,i)=>{macroState[i]=+v;}); if (sound.routes) sound.routes.forEach((r,i)=>{routeState[i]=Object.assign(routeState[i],r);}); const u=+sound.uncertainty_influence; document.querySelector('#uncertainty').value=u; document.querySelector('#uncertainty-value').textContent=u.toFixed(4); renderSoundControls(); bindSoundControls(); baseState.forEach((v,i)=>sendEngineParameter(i,v)); modeRatios.forEach((v,i)=>sendMode(i,v,modeWeights[i])); macroState.forEach((v,i)=>{sendCC(58,i); send14(59,60,v);}); routeState.forEach((_,i)=>sendRoute(i)); send14(61,62,u); }
 function render() {
   names.forEach((_, i) => {
     document.querySelector(`#raw-${i}`).textContent = raw[i].toFixed(i >= 9 ? 1 : 3);
@@ -113,6 +159,8 @@ function handleMidi(event) {
   const pairBases = new Map();
   for (let i=0; i<4; ++i) pairBases.set([14,15,16,17][i], [61,62,63,64][i]);
   for (let i=0; i<names.length; ++i) pairBases.set(70+i, 81+i);
+  for (let i=0; i<8; ++i) pairBases.set(92+i, 100+i);
+  for (let i=0; i<5; ++i) { pairBases.set(108+i, 113+i); pairBases.set(118+i, 123+i); }
   for (const [msb, lsb] of pairBases) {
     if (cc === msb || cc === lsb) {
       const encoded = receive14(msb, lsb, {controller:cc, value});
@@ -128,8 +176,16 @@ function handleMidi(event) {
         const high = msb === 17 ? decode14(encoded)*max : +(old[1] || max);
         document.querySelector('#selected-range').textContent = `${low.toFixed(6)} – ${high.toFixed(6)}`;
       } else {
-        const i = msb - 70;
-        raw[i] = (bipolar.has(i) ? decodeSigned14(encoded) : decode14(encoded)) * domains[i];
+        if (msb >= 70 && msb < 70 + names.length) {
+          const i = msb - 70;
+          raw[i] = (bipolar.has(i) ? decodeSigned14(encoded) : decode14(encoded)) * domains[i];
+        } else if (msb >= 92 && msb < 100) {
+          const i = msb - 92; baseState[i] = decode14(encoded); const el=document.querySelector(`#base-${i}`); if(el){el.value=baseState[i]; document.querySelector(`#base-value-${i}`).textContent=baseState[i].toFixed(4);}
+        } else if (msb >= 108 && msb < 113) {
+          const i = msb - 108; modeRatios[i] = 0.5 + 4.5 * decode14(encoded); const el=document.querySelector(`#ratio-${i}`); if(el){el.value=modeRatios[i]; document.querySelector(`#ratio-value-${i}`).textContent=modeRatios[i].toFixed(4);}
+        } else if (msb >= 118 && msb < 123) {
+          const i = msb - 118; modeWeights[i] = decode14(encoded); const el=document.querySelector(`#weight-${i}`); if(el){el.value=modeWeights[i]; document.querySelector(`#weight-value-${i}`).textContent=modeWeights[i].toFixed(4);}
+        }
         render();
       }
       return;
@@ -138,6 +194,9 @@ function handleMidi(event) {
   if (cc === 12) document.querySelector('#state').textContent = stateNames[value] || 'UNKNOWN';
   else if (cc === 13) document.querySelector('#progress').textContent = `${Math.round(value / 127 * 100)}%`;
   else if (cc >= 30 && cc < 30 + names.length) { const i = cc - 30; norm[i] = bipolar.has(i) ? value/127*2-1 : value/127; render(); }
+  else if (cc >= 45 && cc < 45 + destinationNames.length) { const i=cc-45; const el=document.querySelector(`#destination-${i}`); if(el) { el.textContent=(value/127*2-1).toFixed(3); } }
+  else if (cc === 59) { document.querySelector('#uncertainty').value=value/127; document.querySelector('#uncertainty-value').textContent=(value/127).toFixed(4); }
+  else if (cc >= 65 && cc < 65 + macroNames.length) { const i=cc-65; macroState[i]=value/127; const el=document.querySelector(`#macro-${i}`); if(el){el.value=macroState[i]; document.querySelector(`#macro-value-${i}`).textContent=macroState[i].toFixed(4);} }
 }
 function selectPorts() {
   const inputs = [...midi.inputs.values()], outputs = [...midi.outputs.values()];
@@ -155,6 +214,13 @@ document.querySelector('#set-duration').onclick = () => sendCC(25, (+document.qu
 feature.onchange = refreshFeature;
 document.querySelector('#set-mode').onclick = () => { sendCC(21, +feature.value); sendCC(22, +document.querySelector('#mode').value); };
 document.querySelector('#set-range').onclick = () => { const i=+feature.value, max=domains[i]; sendCC(21,i); sendCC14(23,26,+document.querySelector('#manual-low').value/max*16383); sendCC14(24,27,+document.querySelector('#manual-high').value/max*16383); };
+renderSoundControls();
+bindSoundControls();
+document.querySelector('#uncertainty').oninput=e=>{const v=+e.target.value; document.querySelector('#uncertainty-value').textContent=v.toFixed(4); send14(61,62,v);};
+const referenceSound={format:'bass-tracker-sound-v1',base_parameters:[.45,.2,.06/.42,.035/.22,.08/.42,.12/.66,.5,.15],mode_ratios:[1,1.37,1.93,2.71,3.89],mode_weights:[.58,.30,.22,.16,.11],macros:[0,0,0,0,0],uncertainty_influence:1,routes:[{enabled:true,source:0,destination:7,amount:.85,curve:0,smoothing:15},{enabled:true,source:1,destination:0,amount:.9,curve:0,smoothing:0},{enabled:true,source:2,destination:8,amount:.8,curve:0,smoothing:25},{enabled:true,source:5,destination:2,amount:.75,curve:0,smoothing:40},{enabled:true,source:6,destination:3,amount:.8,curve:0,smoothing:30},{enabled:true,source:7,destination:4,amount:.65,curve:0,smoothing:20},{enabled:true,source:10,destination:12,amount:.35,curve:0,smoothing:30},{enabled:true,source:9,destination:6,amount:.22,curve:0,smoothing:15},{enabled:true,source:8,destination:11,amount:.7,curve:0,smoothing:50},{enabled:true,source:5,destination:9,amount:.45,curve:0,smoothing:50},{enabled:true,source:7,destination:10,amount:.5,curve:0,smoothing:30},{enabled:true,source:1,destination:13,amount:.25,curve:0,smoothing:10}]};
+document.querySelector('#reference').onclick=()=>{sendCC(20,4); applySound(referenceSound);};
+document.querySelector('#export').onclick=()=>{const blob=new Blob([JSON.stringify(soundJSON(),null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bass-tracker-sound.json'; a.click(); URL.revokeObjectURL(a.href);};
+document.querySelector('#import').onchange=e=>{const file=e.target.files[0]; if(file){const reader=new FileReader(); reader.onload=()=>{try{applySound(JSON.parse(reader.result));}catch(err){alert(err.message);}}; reader.readAsText(file);}};
 refreshFeature(); render();
 </script>
 </body></html>

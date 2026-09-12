@@ -79,8 +79,9 @@ route resets its state, and disabling a route clears its state deterministically
 
 At the current 93.75 Hz analysis rate, the new analysis is fixed-size and uses
 no allocation, locks, filesystem, FFT, or future samples. The matrix is also
-fixed-size and costs at most 16 routes of scalar work per analysis frame, with
-no routes enabled in the firmware milestone.
+fixed-size and costs at most 16 routes of scalar work per analysis frame. The
+resynthesis build enables the reference route set; the diagnostic build keeps
+the matrix available without changing the sine-monitor path.
 
 ## USB / UI boundary
 
@@ -114,3 +115,27 @@ the existing studio recording, replays it at 0.25×, 1×, and 2.5× synthetic
 gains, and verifies that separate finite calibrations produce comparable
 normalized amplitude and attack trajectories. This is test-only gain scaling;
 the production input path remains untouched.
+
+## Resynthesis control extension
+
+The optional `RESYNTH_ENGINE=1` build adds sound-design controls on the same
+channel-16 CC protocol. The reference sound is restored with command CC 20,
+value 4. Base parameters use selector CC 40 and a 14-bit value on CC 41/42;
+the selector values 0..7 are `excitation_amount`, `upper_mode_energy`,
+`mode_coupling`, `feedback`, `nonlinearity`, `damping`, `ratio_spread`, and
+`output_texture`. Values are normalized 0..1 and mapped to safe engine domains.
+
+Mode selection is CC 43. Ratio uses CC 44/45 and maps 0..1 to 0.5..5.0;
+weight uses CC 46/47 and maps 0..1 to 0..1. Route selection is CC 48. Route
+enabled, source, and destination use CC 49, 50, and 51. Route amount is signed
+14-bit CC 52/53, curve is signed 14-bit CC 54/55, and smoothing is unipolar
+14-bit CC 56/57 mapped to 0..2000 ms. Macro selection/value use CC 58 and
+14-bit CC 59/60. The uncertainty-influence macro is unipolar 14-bit CC 61/62
+and scales only routes whose source is candidate competition, octave tension,
+pitch instability, or noise/transient.
+
+Telemetry keeps normalized expression on 7-bit CC 30..40 and adds 7-bit signed
+destination values on CC 45..58. Engine base parameters, ratios, and weights
+are reported as 14-bit pairs on CC 92..107, CC 108..117, and CC 118..127.
+Macros are reported on CC 65..69 and uncertainty influence on CC 59. Sound
+presets are browser JSON only; calibration ranges are intentionally excluded.

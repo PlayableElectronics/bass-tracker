@@ -214,14 +214,22 @@ void PrintExpressionRow(const bass::BassAnalysis& analysis)
 #endif
 
 #if BASS_EXPRESSION_USB_MIDI
-void EmitExpressionMidi(const bass::BassAnalysis& analysis)
+void EmitExpressionMidi(const bass::BassAnalysis& analysis,
+                        const bass::ModulationFrame& modulation)
 {
     if(analysis.sequence % kExpressionMidiDivider != 0)
         return;
     // 7-bit state/progress plus 14-bit ranges and raw feature pairs.
-    uint8_t bytes[192] = {};
+    uint8_t bytes[512] = {};
     const size_t size = expression_midi_protocol.BuildTelemetry(
-        analysis.expression, expression_calibration.Status(), bytes, sizeof(bytes));
+        analysis.expression, expression_calibration.Status(), bytes, sizeof(bytes),
+        &modulation,
+#if BASS_RESYNTH_ENGINE
+        &resynthesis_engine, &modulation_matrix
+#else
+        nullptr, nullptr
+#endif
+    );
     if(size > 0)
         expression_midi.SendMessage(bytes, size);
 }
@@ -237,7 +245,13 @@ void ProcessExpressionMidiControls()
         const ControlChangeEvent control = event.AsControlChange();
         expression_midi_protocol.HandleControlChange(
             static_cast<uint8_t>(control.channel), control.control_number,
-            control.value, expression_calibration);
+            control.value, expression_calibration,
+#if BASS_RESYNTH_ENGINE
+            &resynthesis_engine, &modulation_matrix
+#else
+            nullptr, nullptr
+#endif
+        );
     }
 }
 #endif
@@ -341,7 +355,7 @@ void AnalyzeBlock(const AnalysisBlock& block)
     monitor_pitch_valid = tracked.valid;
 #endif
 #if BASS_EXPRESSION_USB_MIDI
-    EmitExpressionMidi(result);
+    EmitExpressionMidi(result, modulation);
 #else
     PrintCsvRow(result);
     PrintExpressionRow(result);

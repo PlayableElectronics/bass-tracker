@@ -54,6 +54,14 @@ The new abstract destinations also provide space for later WebMIDI editing:
 destinations. The current engine uses the relevant destinations directly and
 keeps all control values in bounded scalar ranges.
 
+The browser exposes reversible exploration macros without replacing the
+detailed controls: `SOFTNESS` reduces upper energy, feedback and nonlinearity
+while increasing damping; `INTERACTION` increases bounded coupling/feedback;
+`CHAOS` increases bounded interaction/nonlinearity; `ATTACK BODY` increases
+attack excitation; and `HARMONICITY` interpolates custom ratios toward the
+integer sequence 1..5. Macro values are offsets applied at frame evaluation,
+so the reference base preset remains recoverable.
+
 Uncertainty does not retune the structural root. Candidate competition,
 octave tension, pitch instability, and noise/transient information alter
 coupling, feedback, mode relationships, and excitation instead. With those
@@ -90,6 +98,30 @@ Exact CPU percentage should be measured with the target build's profiler; the
 engine is intentionally small enough for the current 48 kHz / 16-sample audio
 configuration.
 
-Future work can add stereo mode distribution, route editing and alternate mode
-sets. Reverb, a conventional FM architecture, compression, pitch quantization
-and a preset library are deliberately out of scope.
+Future work can add stereo mode distribution and alternate mode sets. Reverb,
+a conventional FM architecture, compression, pitch quantization and a
+persistent preset library are deliberately out of scope.
+
+## Sound-design protocol
+
+The browser sound preset format is readable JSON with the keys
+`base_parameters`, `mode_ratios`, `mode_weights`, `macros`,
+`uncertainty_influence`, and `routes`. It intentionally excludes calibration.
+The reference preset is the exact original engine setup: ratios
+`1, 1.37, 1.93, 2.71, 3.89`, weights `0.58, 0.30, 0.22, 0.16, 0.11`, and
+all exploration macros at zero.
+
+The extended CC assignments and 14-bit encoding are documented in
+`ExpressionArchitecture.md`; all fine controls use normalized or signed
+normalized 14-bit pairs and are mapped to safe engine domains on the device.
+
+The browser sound-design panel edits all eight base parameters, five arbitrary
+mode ratios, five bounded mode weights, the fixed-capacity modulation routes,
+and five reversible exploration macros. `SOFTNESS`, `INTERACTION`, `CHAOS`,
+`ATTACK BODY`, and `HARMONICITY` are exploration offsets evaluated from the
+current base state; they do not replace the detailed controls. The
+`UNCERTAINTY INFLUENCE` control scales only routes sourced by residual or
+uncertainty features while leaving those expression measurements visible.
+Sound presets are browser-side JSON and contain no calibration ranges. The
+`Reference / Original` action restores the exact cbb8120 ratios, weights and
+base setup, with macros cleared.
