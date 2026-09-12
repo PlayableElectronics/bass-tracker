@@ -50,6 +50,23 @@
 <p>Selected learned range: <strong id="selected-range">—</strong></p>
 <p class="muted">Manual ranges are feature-domain values, not audio gain. AUTO restores the frozen learned range; LOCKED snapshots the current active range. For pitch motion, the learned/active range is a magnitude range (for example 12.3 … 184.0 cents), while live raw motion remains signed. Reloading the page does not alter the device.</p>
 
+<h2>Experimental resynthesis destinations</h2>
+<p class="muted">The optional <code>RESYNTH_ENGINE=1</code> firmware consumes normalized expression through the fixed modulation matrix. These are structural controls for the coupled-mode engine, not MIDI-note or FM parameters.</p>
+<table><thead><tr><th>destination</th><th>default expression route</th><th>intent</th></tr></thead><tbody>
+<tr><td>excitation_amount</td><td>amplitude</td><td>energy injected into the modes</td></tr>
+<tr><td>excitation_complexity</td><td>attack_strength</td><td>attack distribution across modes</td></tr>
+<tr><td>upper_mode_energy</td><td>brightness</td><td>upper inharmonic mode emphasis</td></tr>
+<tr><td>instability_interaction</td><td>candidate_competition</td><td>coupling/feedback complexity</td></tr>
+<tr><td>mode_coupling</td><td>octave_tension</td><td>energy exchange between modes</td></tr>
+<tr><td>stochastic_excitation</td><td>noise_transient</td><td>bounded attack scattering</td></tr>
+<tr><td>ratio_spread</td><td>pitch_instability</td><td>small inharmonic relationship movement</td></tr>
+<tr><td>damping</td><td>decay_rate</td><td>mode energy lifetime</td></tr>
+<tr><td>structural_morph</td><td>pitch_motion</td><td>small interaction texture change</td></tr>
+<tr><td>feedback_amount</td><td>candidate_competition</td><td>bounded return energy</td></tr>
+<tr><td>nonlinearity</td><td>noise_transient</td><td>transient shaping</td></tr>
+<tr><td>output_texture</td><td>attack_strength</td><td>attack interaction texture</td></tr>
+</tbody></table>
+
 <script>
 const channel = 15, status = 0xB0 | channel;
 const names = ['amplitude','attack_strength','brightness','periodicity','tracker_confidence','candidate_competition','octave_tension','noise_transient','decay_rate','pitch_motion','pitch_instability'];

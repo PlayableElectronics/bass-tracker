@@ -19,6 +19,13 @@ enum class ModulationDestination : uint8_t
     StochasticExcitation,
     ResonatorDamping,
     StructuralMorph,
+    ExcitationAmount,
+    UpperModeEnergy,
+    FeedbackAmount,
+    Nonlinearity,
+    Damping,
+    RatioSpread,
+    OutputTexture,
     Count,
 };
 

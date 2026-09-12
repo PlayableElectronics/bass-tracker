@@ -16,9 +16,13 @@
 #include "ModulationMatrix.h"
 #include "PitchDetector.h"
 #include "PitchTracker.h"
+#include "ResynthesisEngine.h"
 
 #ifndef BASS_EXPRESSION_USB_MIDI
 #define BASS_EXPRESSION_USB_MIDI 0
+#endif
+#ifndef BASS_RESYNTH_ENGINE
+#define BASS_RESYNTH_ENGINE 0
 #endif
 
 #if BASS_EXPRESSION_USB_MIDI
@@ -79,10 +83,14 @@ static bass::ExpressionAnalyzer expression_analyzer;
 static bass::ExpressionCalibration expression_calibration;
 static bass::ModulationMatrix modulation_matrix;
 static bass::ExpressionMidiProtocol expression_midi_protocol;
+#if BASS_RESYNTH_ENGINE
+static bass::ResynthesisEngine resynthesis_engine;
+#else
 static volatile float monitor_frequency_hz = 0.0f;
 static volatile bool monitor_pitch_valid = false;
 static float monitor_phase = 0.0f;
 static float monitor_gain = 0.0f;
+#endif
 
 #if BASS_EXPRESSION_USB_MIDI
 static MidiUsbHandler expression_midi;
@@ -324,11 +332,14 @@ void AnalyzeBlock(const AnalysisBlock& block)
         block.input_rms, block.filtered_rms);
     expression_calibration.Update(result.expression.raw, kAnalysisFrameSeconds);
     result.expression.normalized = expression_calibration.Normalize(result.expression.raw);
-    // No routes are active in this milestone. Processing the fixed-size matrix
-    // here verifies its real-time boundary without introducing a synth engine.
-    modulation_matrix.Process(result.expression, kAnalysisFrameSeconds);
+    const bass::ModulationFrame modulation
+        = modulation_matrix.Process(result.expression, kAnalysisFrameSeconds);
+#if BASS_RESYNTH_ENGINE
+    resynthesis_engine.SetFrame(result.expression, modulation, kAnalysisFrameSeconds);
+#else
     monitor_frequency_hz = tracked.frequency_hz;
     monitor_pitch_valid = tracked.valid;
+#endif
 #if BASS_EXPRESSION_USB_MIDI
     EmitExpressionMidi(result);
 #else
@@ -347,6 +358,9 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer in,
         const float input = in[i];
         out[i] = input;
 
+#if BASS_RESYNTH_ENGINE
+        out[i + 1] = resynthesis_engine.Process();
+#else
         const float target_gain = monitor_pitch_valid ? 0.15f : 0.0f;
         monitor_gain += 0.002f * (target_gain - monitor_gain);
 
@@ -364,6 +378,7 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer in,
         const float sine = std::sin(2.0f * 3.14159265359f * monitor_phase)
                            * monitor_gain;
         out[i + 1] = sine;
+#endif
         const float input_magnitude = std::fabs(input);
         if(input_magnitude > hop_input_peak)
             hop_input_peak = input_magnitude;
@@ -446,6 +461,10 @@ int main(void)
     expression_analyzer.Init();
     expression_calibration.Init();
     modulation_matrix.Init();
+#if BASS_RESYNTH_ENGINE
+    bass::ResynthesisEngine::ConfigureDefaultRoutes(modulation_matrix);
+    resynthesis_engine.Init(kSampleRate);
+#endif
     expression_midi_protocol.Init();
 #if BASS_EXPRESSION_USB_MIDI
     MidiUsbHandler::Config midi_config;

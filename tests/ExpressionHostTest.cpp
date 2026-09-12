@@ -6,6 +6,7 @@
 #include "ExpressionCalibration.h"
 #include "ExpressionMidiProtocol.h"
 #include "ModulationMatrix.h"
+#include "ResynthesisEngine.h"
 
 namespace
 {
@@ -210,5 +211,40 @@ int main()
     assert(matrix.Process(frame, kFrameSeconds).values[
                static_cast<size_t>(bass::ModulationDestination::ModeCoupling)] == 0.0f);
     assert(!matrix.SetRoute(bass::kMaxModulationRoutes, route));
+
+    bass::ResynthesisEngine engine;
+    engine.Init(48000.0f);
+    bass::ResynthesisEngine::BaseParameters base = {};
+    base.feedback = 0.20f;
+    assert(engine.SetModeRatio(1, 1.37f));
+    assert(!engine.SetModeRatio(0, 0.1f));
+    engine.SetBaseParameters(base);
+    bass::ModulationMatrix engine_matrix;
+    engine_matrix.Init();
+    bass::ResynthesisEngine::ConfigureDefaultRoutes(engine_matrix);
+    bass::ExpressionFrame engine_frame = frame;
+    engine_frame.pitch_valid = true;
+    engine_frame.pitch_hz = 41.0f;
+    float maximum_output = 0.0f;
+    for(int block = 0; block < 120; ++block)
+    {
+        const float shape = static_cast<float>(block % 11) / 10.0f;
+        for(size_t i = 0; i < bass::kExpressionFeatureCount; ++i)
+            engine_frame.normalized.values[i] = (i == static_cast<size_t>(bass::ExpressionFeature::PitchMotion))
+                                                    ? (shape * 2.0f - 1.0f)
+                                                    : shape;
+        const bass::ModulationFrame engine_modulation
+            = engine_matrix.Process(engine_frame, kFrameSeconds);
+        engine.SetFrame(engine_frame, engine_modulation, kFrameSeconds);
+        for(int sample = 0; sample < 256; ++sample)
+        {
+            const float output = engine.Process();
+            assert(std::isfinite(output));
+            assert(std::fabs(output) <= 0.92001f);
+            maximum_output = std::fmax(maximum_output, std::fabs(output));
+        }
+        engine_frame.pitch_hz = 41.0f + static_cast<float>(block) * 0.45f;
+    }
+    assert(maximum_output > 0.001f);
     return 0;
 }
