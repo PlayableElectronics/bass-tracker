@@ -1,0 +1,19 @@
+{
+  "name": "rootfix_AB",
+  "fix_a_recovery": true,
+  "fix_b_guard": true,
+  "recovery_anchor_score": 0.75,
+  "recovery_return_score": 0.9,
+  "recovery_anchor_match_cents": 100.0,
+  "recovery_departure_cents": 250.0,
+  "recovery_return_cents": 70.0,
+  "recovery_max_frames": 6,
+  "recovery_attack_window_sec": 0.2,
+  "recovery_anchor_max_age_frames": 4,
+  "recovery_mode": "direct",
+  "recovery_slew": 0.85,
+  "guard_established_frames": 6,
+  "guard_pre_match_cents": 100.0,
+  "guard_max_relative_score": 0.97,
+  "guard_confirm_frames": 6
+}
